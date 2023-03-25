@@ -1,0 +1,22 @@
+# @format
+name: Spaced repetition user management
+on:
+  pull_request:
+    branches:
+      - main
+env:
+  JWT_SECRET_KEY: ${{ secrets.JWT_SECRET_KEY }}
+jobs:
+  setup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Install Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+      - name: Install packages
+        run: npm install
+      - name: Setup env
+        run: chmod +x ./.github/scripts/setup-env.sh && ./.github/secrets/setup-env.sh
