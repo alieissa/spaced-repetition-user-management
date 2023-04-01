@@ -1,0 +1,21 @@
+{
+  "name": "user-management",
+  "version": "1.0.0",
+  "description": "Spaced Repetition user management",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/alieissa/spaced-repetition-user-management.git"
+  },
+  "author": "Ali Eissa",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/alieissa/spaced-repetition-user-management/issues"
+  },
+  "homepage": "https://github.com/alieissa/spaced-repetition-user-management#readme",
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}
