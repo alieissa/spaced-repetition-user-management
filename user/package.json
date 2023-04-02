@@ -1,0 +1,12 @@
+{
+  "name": "user",
+  "version": "1.0.0",
+  "description": "User login, logout and registration for spaced repetition api",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Ali Eissa",
+  "license": "ISC"
+}

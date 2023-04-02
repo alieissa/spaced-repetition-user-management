@@ -1,0 +1,50 @@
+# @format
+
+name: User
+on:
+  push:
+    branches:
+      - 3-create-user-management-deploy-script
+  pull_request:
+    branches:
+      - master
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+        working-directory: user
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Nodejs installation
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18 #Probably good idea not use a hard-coded value here
+
+      - name: Packages installation
+        run: npm install
+
+      - name: Compression
+        run: zip -r user.zip .
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.API_AUTHORIZER_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.API_AUTHORIZER_SECRET_ACCESS_KEY }}
+          aws-region: ${{ vars.REGION }}
+
+      - name: User management deployment
+        run: >
+          aws lambda update-function-code 
+          --function-name=spaced-repetition-user-management-user
+          --zip-file=fileb://user.zip
+
+      - name: Authorizer keys deployment
+        run: >
+          aws lambda update-function-configuration
+          --function-name spaced-repetition-user-management-user
+          --environment "Variables={REGION=${{ vars.REGION }}, DYNAMODB_ACCESS_KEY_ID=${{ secrets.DYNAMODB_ACCESS_KEY_ID }},DYNAMODB_SECRET_ACCESS_KEY=${{ secrets.DYNAMODB_SECRET_ACCESS_KEY }}}"
