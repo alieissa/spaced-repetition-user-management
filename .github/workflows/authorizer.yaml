@@ -1,6 +1,6 @@
 # @format
 
-name: Build
+name: Authorizer
 on:
   pull_request:
     branches:

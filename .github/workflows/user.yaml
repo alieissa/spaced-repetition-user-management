@@ -2,9 +2,6 @@
 
 name: User
 on:
-  push:
-    branches:
-      - 3-create-user-management-deploy-script
   pull_request:
     branches:
       - master
