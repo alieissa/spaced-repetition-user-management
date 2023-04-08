@@ -4,7 +4,7 @@ import { save } from './db.js'
 
 const validateInput = (body) => {
   if (!body.hasOwnProperty('email') || !body.hasOwnProperty('password')) {
-    const invalidInputError = new Error('Missing email or password field')
+    const invalidInputError = new Error('Missing email or password')
     invalidInputError.name = 'InvalidInputError'
     throw invalidInputError
   }
@@ -20,15 +20,17 @@ const hashPassword = async (password) => {
 const register = async (event) => {
   try {
     const { email, password } = validateInput(JSON.parse(event.body))
-    await save({ email, password: hashPassword(password) })
+    const hash = await hashPassword(password)
+    await save({ email, password: hash })
     return { statusCode: 201 }
   } catch (error) {
     switch (error.name) {
-      case 'SyntaxError':
       case 'InvalidInputError':
-        return error.message
+        return { statusCode: 400, body: error.message }
+      case 'ConditionalCheckFailedException':
+        return { statusCode: 422, body: 'User with email already exists' }
       default:
-        return 'Oops: Something went wrong'
+        return { statusCode: 500, body: 'Oops: Something went wrong' }
     }
   }
 }

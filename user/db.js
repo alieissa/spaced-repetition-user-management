@@ -23,7 +23,8 @@ const getInput = ({ email, password }) => ({
     },
   },
   TableName: process.env.DYNAMODB_TABLENAME,
+  ConditionExpression: 'attribute_not_exists(email)',
 })
 
-const save = async (data) => await client.putItem(getInput(data))
+const save = async (data) => client.putItem(getInput(data))
 export { save }

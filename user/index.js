@@ -7,7 +7,7 @@ const getRoute = (event) => {
 export const handler = async (event) => {
   switch (getRoute(event)) {
     case 'register':
-      return await register(event)
+      return register(event)
     default:
       console.log(event)
   }
