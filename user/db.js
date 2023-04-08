@@ -22,7 +22,7 @@ const getInput = ({ email, password }) => ({
       S: password,
     },
   },
-  TableName: 'Spaced-Repetition-Users', // TODO Get from configs
+  TableName: process.env.DYNAMODB_TABLENAME,
 })
 
 const save = async (data) => await client.putItem(getInput(data))
