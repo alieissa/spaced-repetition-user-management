@@ -44,4 +44,4 @@ jobs:
         run: >
           aws lambda update-function-configuration
           --function-name spaced-repetition-user-management-user
-          --environment "Variables={REGION=${{ vars.REGION }}, DYNAMODB_ACCESS_KEY_ID=${{ secrets.DYNAMODB_ACCESS_KEY_ID }},DYNAMODB_SECRET_ACCESS_KEY=${{ secrets.DYNAMODB_SECRET_ACCESS_KEY }}}"
+          --environment "Variables={REGION=${{ vars.REGION }}, DYNAMODB_TABLENAME=${{ vars.DYNAMODB_TABLENAME }}}"
