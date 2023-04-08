@@ -2,6 +2,9 @@
 
 name: User
 on:
+  push:
+    branches:
+      - 6-create-login-handler
   pull_request:
     branches:
       - master
@@ -40,7 +43,7 @@ jobs:
           --function-name=spaced-repetition-user-management-user
           --zip-file=fileb://user.zip
 
-      - name: Authorizer keys deployment
+      - name: User keys deployment
         run: >
           aws lambda update-function-configuration
           --function-name spaced-repetition-user-management-user

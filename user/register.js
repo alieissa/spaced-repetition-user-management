@@ -1,16 +1,8 @@
 /** @format */
 import bcrypt from 'bcryptjs'
 import { save } from './db.js'
-
-const validateInput = (body) => {
-  if (!body.hasOwnProperty('email') || !body.hasOwnProperty('password')) {
-    const invalidInputError = new Error('Missing email or password')
-    invalidInputError.name = 'InvalidInputError'
-    throw invalidInputError
-  }
-
-  return body
-}
+import { BadRequest, ServerException } from './http.js'
+import { validateInput } from './validation.js'
 
 const hashPassword = async (password) => {
   const salt = await bcrypt.genSalt(10)
@@ -26,11 +18,11 @@ const register = async (event) => {
   } catch (error) {
     switch (error.name) {
       case 'InvalidInputError':
-        return { statusCode: 400, body: error.message }
+        return BadRequest(error.message)
       case 'ConditionalCheckFailedException':
-        return { statusCode: 422, body: 'User with email already exists' }
+        return UnprocessableContentError('User with email already exists')
       default:
-        return { statusCode: 500, body: 'Oops: Something went wrong' }
+        return ServerException()
     }
   }
 }
