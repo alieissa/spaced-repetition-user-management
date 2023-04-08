@@ -17,8 +17,19 @@ const OK = (body) => ({
   body,
 })
 
+const Created = () => ({
+  statusCode: 201,
+})
+
 const Unauthorized = () => ({
   statusCode: 401,
 })
 
-export { BadRequest, OK, ServerException, UnprocessableContent, Unauthorized }
+export {
+  BadRequest,
+  Created,
+  OK,
+  ServerException,
+  UnprocessableContent,
+  Unauthorized,
+}

@@ -1,17 +1,22 @@
 /** @format */
 import bcrypt from 'bcryptjs'
-import { getItem } from './db.js'
-import { BadRequest, ServerException } from './http.js'
+import jwt from 'jsonwebtoken'
+import * as User from './db.js'
+import { BadRequest, OK, ServerException, Unauthorized } from './http.js'
 import { validateInput } from './validation.js'
+
+const getToken = (data) => {
+  return jwt.sign({ data }, process.env.JWT_SECRET_KEY, { expiresIn: '72h' })
+}
 
 const login = async (event) => {
   try {
     const { email, password } = validateInput(JSON.parse(event.body))
-    const { Item } = await getItem({ email })
+    const { Item } = await User.get({ email })
 
     const isAuthorized = await bcrypt.compare(password, Item.password.S)
-    // TODO return JWT or Unauthorized error
-    return isAuthorized ? { statusCode: 200 } : { statusCode: 401 }
+    const token = getToken({ email: Item.email.S })
+    return isAuthorized ? OK(token) : Unauthorized()
   } catch (error) {
     switch (error.name) {
       case 'InvalidInputError':

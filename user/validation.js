@@ -6,7 +6,6 @@ const validateInput = (body) => {
     invalidInputError.name = 'InvalidInputError'
     throw invalidInputError
   }
-
   return body
 }
 

@@ -1,7 +1,7 @@
 /** @format */
 import bcrypt from 'bcryptjs'
-import { save } from './db.js'
-import { BadRequest, ServerException } from './http.js'
+import * as User from './db.js'
+import { BadRequest, Created, ServerException } from './http.js'
 import { validateInput } from './validation.js'
 
 const hashPassword = async (password) => {
@@ -13,8 +13,8 @@ const register = async (event) => {
   try {
     const { email, password } = validateInput(JSON.parse(event.body))
     const hash = await hashPassword(password)
-    await save({ email, password: hash })
-    return { statusCode: 201 }
+    await User.save({ email, password: hash })
+    return Created()
   } catch (error) {
     switch (error.name) {
       case 'InvalidInputError':

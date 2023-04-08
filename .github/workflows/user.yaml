@@ -2,9 +2,6 @@
 
 name: User
 on:
-  push:
-    branches:
-      - 6-create-login-handler
   pull_request:
     branches:
       - master
@@ -47,4 +44,4 @@ jobs:
         run: >
           aws lambda update-function-configuration
           --function-name spaced-repetition-user-management-user
-          --environment "Variables={REGION=${{ vars.REGION }}, DYNAMODB_TABLENAME=${{ vars.DYNAMODB_TABLENAME }}}"
+          --environment "Variables={REGION=${{ vars.REGION }}, DYNAMODB_TABLENAME=${{ vars.DYNAMODB_TABLENAME }}, JWT_SECRET_KEY=${{secrets.JWT_SECRET_KEY}}}"
