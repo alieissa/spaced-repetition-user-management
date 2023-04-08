@@ -13,7 +13,7 @@ const client = new AWS.DynamoDB({
   region: process.env.REGION,
 })
 
-const getInput = ({ email, password }) => ({
+const getPutItemInput = ({ email, password }) => ({
   Item: {
     email: {
       S: email,
@@ -26,5 +26,16 @@ const getInput = ({ email, password }) => ({
   ConditionExpression: 'attribute_not_exists(email)',
 })
 
-const save = async (data) => client.putItem(getInput(data))
-export { save }
+const getGetItemInput = ({ email, password }) => {
+  return {
+    Key: {
+      email: {
+        S: email,
+      },
+    },
+    TableName: process.env.DYNAMODB_TABLENAME,
+  }
+}
+const get = async (data) => client.getItem(getGetItemInput(data))
+const save = async (data) => client.putItem(getPutItemInput(data))
+export { save, get }

@@ -40,8 +40,8 @@ jobs:
           --function-name=spaced-repetition-user-management-user
           --zip-file=fileb://user.zip
 
-      - name: Authorizer keys deployment
+      - name: User keys deployment
         run: >
           aws lambda update-function-configuration
           --function-name spaced-repetition-user-management-user
-          --environment "Variables={REGION=${{ vars.REGION }}, DYNAMODB_TABLENAME=${{ vars.DYNAMODB_TABLENAME }}}"
+          --environment "Variables={REGION=${{ vars.REGION }}, DYNAMODB_TABLENAME=${{ vars.DYNAMODB_TABLENAME }}, JWT_SECRET_KEY=${{secrets.JWT_SECRET_KEY}}}"
