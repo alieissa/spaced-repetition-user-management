@@ -9,4 +9,14 @@ const validateInput = (body) => {
   return body
 }
 
-export { validateInput }
+const validateAuthorizationHeader = (headers) => {
+  if (!headers.hasOwnProperty('authorization')) {
+    const invalidAuthorizationHeaderError = new Error(
+      'Authorization token missing',
+    )
+    invalidAuthorizationHeaderError.name = 'InvalidAuthorizationHeaderError'
+    throw invalidAuthorizationHeaderError
+  }
+  return headers
+}
+export { validateInput, validateAuthorizationHeader }
