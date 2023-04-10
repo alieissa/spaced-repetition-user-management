@@ -1,19 +1,61 @@
 /** @format */
 
-// AWS is included by default in Lambdas
-// https://aws.amazon.com/blogs/developer/why-and-how-you-should-use-aws-sdk-for-javascript-v3-on-node-js-18/#:~:text=The%20Node.,default%20in%20AWS%20Lambda%20Node
-// Only importing these to make sure imports work and nothing else
-import * as AWS from '@aws-sdk/client-dynamodb'
-import { ExtractJwt } from 'passport-jwt'
+import jwt from 'jsonwebtoken'
+import redis from 'redis'
+import { validateAuthorizationHeader } from './validation.js'
 
-// https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/DynamoDB.html#constructor-property
-const client = new AWS.DynamoDB({
-  region: process.env.REGION || 'eu-central-1',
-  accessKeyId: process.env.API_AUTHORIZER_ACCESS_KEY_ID,
-  secretAccessKey: process.env.API_AUTHORIZER_SECRET_ACCESS_KEY,
+const client = redis.createClient({
+  url: process.env.REDIS_URL,
 })
-const opts = { jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken() }
 
-export const handler = () => {
-  console.log('Handler executed')
+const getIAMPolicy = ({ principalId, effect }) => {
+  return {
+    principalId,
+    policyDocument: {
+      Version: '2012-10-17',
+      Statement: [
+        {
+          Action: 'execute-api:Invoke',
+          Effect: effect,
+          Resource:
+            'arn:aws:execute-api:eu-central-1:079829475258:ccb5lhfr50/staging/*', // TODO update once prod environment is ready
+        },
+      ],
+    },
+  }
+}
+
+const verifyToken = async (token) =>
+  jwt.verify(token, process.env.JWT_SECRET_KEY)
+
+export const handler = async (event, _, callback) => {
+  try {
+    const headers = validateAuthorizationHeader(event.headers)
+    const token = await verifyToken(headers.authorization)
+    await client.connect()
+    const count = await client.exists(event.headers.authorization)
+    const isBlacklisted = count > 0
+    client.quit()
+
+    /**
+     * It is not necessary to return an IAM policy, we can configure the authorizer
+     * to accept a simple response, but most of the documentation is for policy,
+     * and it gives us much more granular control so will keep it.
+     *
+     * See https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-lambda-authorizer.html
+     */
+    const pol = getIAMPolicy({
+      principalId: token.data.email,
+      effect: isBlacklisted ? 'Deny' : 'Allow',
+    })
+
+    /**
+     * Tried callback("Allow") and callback("Deny") but that throws errors
+     * it seems callback only recognized "Unauthorized" as a sole argument
+     */
+    return callback(null, pol)
+  } catch (error) {
+    console.error(error)
+    return callback('Unauthorized')
+  }
 }

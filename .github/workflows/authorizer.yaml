@@ -44,4 +44,4 @@ jobs:
         run: >
           aws lambda update-function-configuration
           --function-name spaced-repetition-user-management-authorizer
-          --environment "Variables={REGION=${{ vars.REGION }}, API_AUTHORIZER_ACCESS_KEY_ID=${{ secrets.API_AUTHORIZER_ACCESS_KEY_ID }},API_AUTHORIZER_SECRET_ACCESS_KEY=${{ secrets.API_AUTHORIZER_SECRET_ACCESS_KEY }}}"
+          --environment "Variables={REGION=${{ vars.REGION }}, JWT_SECRET_KEY=${{secrets.JWT_SECRET_KEY}}, REDIS_URL=${{ vars.REDIS_URL }}}"
