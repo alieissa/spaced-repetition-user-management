@@ -28,7 +28,7 @@ const getIAMPolicy = ({ principalId, effect }) => {
 const verifyToken = async (token) =>
   jwt.verify(token, process.env.JWT_SECRET_KEY)
 
-export const handler = async (event, _, callback) => {
+export const handler = async (event) => {
   try {
     const headers = validateAuthorizationHeader(event.headers)
     const token = await verifyToken(headers.authorization)
@@ -44,18 +44,17 @@ export const handler = async (event, _, callback) => {
      *
      * See https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-lambda-authorizer.html
      */
-    const pol = getIAMPolicy({
+    return getIAMPolicy({
       principalId: token.data.email,
       effect: isBlacklisted ? 'Deny' : 'Allow',
     })
-
-    /**
-     * Tried callback("Allow") and callback("Deny") but that throws errors
-     * it seems callback only recognized "Unauthorized" as a sole argument
-     */
-    return callback(null, pol)
   } catch (error) {
     console.error(error)
-    return callback('Unauthorized')
+    /**
+     * This returns 401 HTTP response. It is equivalent to callback("Unauthorized")
+     *
+     * See https://docs.aws.amazon.com/lambda/latest/dg/nodejs-handler.html
+     */
+    throw new Error('Unauthorized')
   }
 }
