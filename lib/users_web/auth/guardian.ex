@@ -1,6 +1,6 @@
 defmodule UsersWeb.Auth.Guardian do
   use Guardian, otp_app: :users
-  require Logger
+
   alias Users.Accounts
 
   def subject_for_token(%{id: id}, _claims) do
@@ -24,7 +24,6 @@ defmodule UsersWeb.Auth.Guardian do
   end
 
   def authenticate(email, password) do
-    Logger.info("Authenticating user")
     case Accounts.get_user_by_email(email) do
       nil ->
         {:error, :unauthorized}
