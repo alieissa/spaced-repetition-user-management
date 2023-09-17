@@ -67,3 +67,5 @@ config :phoenix, :plug_init_mode, :runtime
 config :users, UsersWeb.Auth.Guardian,
   issues: "users_app",
   secret_key: secret_key_base
+
+config :users, Redix, System.get_env("REDIS_URL", "redis://redis:6379")

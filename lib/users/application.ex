@@ -12,8 +12,8 @@ defmodule Users.Application do
       UsersWeb.Telemetry,
       # Start the Ecto repository
       Users.Repo,
-      # Start Redex worker
-      {Redix, host: "redis", name: :tokens},
+      # Start Redix worker
+      {Redix, Application.fetch_env!(:users, Redix)},
       # Start the PubSub system
       {Phoenix.PubSub, name: Users.PubSub},
       # Start the Endpoint (http/https)

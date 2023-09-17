@@ -1,0 +1,49 @@
+on: 
+  pull_request:
+    branches: 
+      - main
+      - master
+env:
+  REPO: 079829475258.dkr.ecr.us-east-1.amazonaws.com
+  IMAGE_NAME: spaced-repetition-user-management
+
+jobs:
+  gen_release:
+    runs-on: ubuntu-20.04
+    name: 11OTP ${{matrix.otp}} / Elixir ${{matrix.elixir}}
+    strategy:
+      matrix:
+        otp: ['25.2.3']
+        elixir: ['1.14.3']
+    steps:
+      - uses: actions/checkout@v3
+      - uses: erlef/setup-beam@v1
+        with:
+          otp-version: ${{matrix.otp}}
+          elixir-version: ${{matrix.elixir}}
+      - name: Get dependencies
+        run: mix deps.get
+      
+      - name: Generate dockerfile
+        run: mix phx.gen.release --docker
+      
+      - name: Ensure migrations execution
+        run: chmod +x ./.github/workflows/update-dockerfile.sh & ./.github/workflows/update-dockerfile.sh
+      
+      - name: Build image
+        run: docker build -t $REPO/$IMAGE_NAME $GITHUB_WORKSPACE
+
+      - name: Login to ECR
+        id: ecr
+        uses: jwalton/gh-ecr-login@v1
+        with:
+          access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
+          secret-access-key: ${{ secrets.AWS_ACCESS_SECRET_KEY }}
+          region: ${{ vars.REGION }}
+      
+      - name: Push to ECR
+        run: |
+          docker build -t $REPO/$IMAGE_NAME $GITHUB_WORKSPACE
+          docker push $REPO/$IMAGE_NAME
+          docker tag $REPO/$IMAGE_NAME $REPO/$IMAGE_NAME:${GITHUB_SHA::6}
+          docker push $REPO/$IMAGE_NAME:${GITHUB_SHA::6}
