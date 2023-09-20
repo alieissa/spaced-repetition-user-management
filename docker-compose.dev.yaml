@@ -8,6 +8,9 @@ services:
   server:
     build: 
       context: .
+      dockerfile: ./Dockerfile.dev
+    volumes:
+      - .:/app
     ports: 
       - "4000:4000"
     environment:
@@ -15,6 +18,7 @@ services:
       REDIS_ENDPOINT: redis
       DATABASE_URL: postgres://postgres:postgres@db:5432/users_dev
       SECRET_KEY_BASE: fdj9324fjsdf012
+    entrypoint: ./init.sh
   redis:
     image: redis:7
     ports:
