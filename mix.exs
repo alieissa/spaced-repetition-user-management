@@ -43,7 +43,9 @@ defmodule Users.MixProject do
       {:guardian, "~> 2.3"},
       {:bcrypt_elixir, "~> 3.0"},
       {:httpoison, "~> 2.1"},
-      {:redix, "~> 1.2"}
+      {:redix, "~> 1.2"},
+      {:ex_machina, "~> 2.7"},
+      {:mox, "~> 1.1.0", only: :test}
     ]
   end
 

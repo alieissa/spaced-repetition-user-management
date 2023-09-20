@@ -1,16 +1,55 @@
-on: 
+on:
   pull_request:
-    branches: 
+    branches:
       - main
-      - master
 env:
   REPO: 079829475258.dkr.ecr.us-east-1.amazonaws.com
   IMAGE_NAME: spaced-repetition-user-management
 
 jobs:
-  gen_release:
+  tests:
     runs-on: ubuntu-20.04
-    name: 11OTP ${{matrix.otp}} / Elixir ${{matrix.elixir}}
+    name: Test
+    services:
+      postgres:
+        image: postgres
+        ports:
+          - 5432:5432
+        env:
+          POSTGRES_PASSWORD: postgres
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      redis:
+        image: redis:7
+        ports:
+          - "6379:6379"
+    strategy:
+      matrix:
+        otp: ['25.2.3']
+        elixir: ['1.14.3']
+    steps:
+      - uses: actions/checkout@v3
+      - uses: erlef/setup-beam@v1
+        with:
+          otp-version: ${{matrix.otp}}
+          elixir-version: ${{matrix.elixir}}
+      
+      - name: Run tests
+        run: |
+          mix deps.get
+          mix test
+        env:
+          POSTGRES_HOST: localhost
+          POSTGRES_PASSWORD: postgres
+          REDIS_HOST: localhost
+    
+  build:
+    needs: tests
+    runs-on: ubuntu-20.04
+    name: Build
     strategy:
       matrix:
         otp: ['25.2.3']
@@ -27,7 +66,7 @@ jobs:
       - name: Generate dockerfile
         run: mix phx.gen.release --docker
       
-      - name: Ensure migrations execution
+      - name: Add migrations
         run: chmod +x ./.github/workflows/update-dockerfile.sh & ./.github/workflows/update-dockerfile.sh
       
       - name: Build image

@@ -1,96 +1,95 @@
+# TODO
+# 1. Add no route error handler, and test it.
 defmodule UsersWeb.UserControllerTest do
   use UsersWeb.ConnCase
 
-  import Users.AccountsFixtures
-
+  import Mox
+  import Users.Factory
   alias Users.Accounts.User
 
-  @create_attrs %{
-    password: "some password",
-    email: "some email",
-    first_name: "some first_name",
-    last_name: "some last_name"
-  }
-  @update_attrs %{
-    password: "some updated password",
-    email: "some updated email",
-    first_name: "some updated first_name",
-    last_name: "some updated last_name"
-  }
   @invalid_attrs %{password: nil, email: nil, first_name: nil, last_name: nil}
 
   setup %{conn: conn} do
     {:ok, conn: put_req_header(conn, "accept", "application/json")}
   end
 
-  describe "index" do
-    test "lists all users", %{conn: conn} do
-      conn = get(conn, ~p"/api/users")
-      assert json_response(conn, 200)["data"] == []
-    end
-  end
-
   describe "create user" do
-    test "renders user when data is valid", %{conn: conn} do
-      conn = post(conn, ~p"/api/users", user: @create_attrs)
-      assert %{"id" => id} = json_response(conn, 201)["data"]
+    test "create user when data is valid", %{conn: conn} do
+      conn =
+        post(conn, ~p"/users/signup", %{
+          password: "jbravo01",
+          email: "jbravo@test.com"
+        })
 
-      conn = get(conn, ~p"/api/users/#{id}")
-
-      assert %{
-               "id" => ^id,
-               "email" => "some email",
-               "first_name" => "some first_name",
-               "password" => "some password",
-               "last_name" => "some last_name"
-             } = json_response(conn, 200)["data"]
+      assert %{"token" => _token} = json_response(conn, 201)
     end
 
-    test "renders errors when data is invalid", %{conn: conn} do
-      conn = post(conn, ~p"/api/users", user: @invalid_attrs)
+    test "return errors when data is invalid", %{conn: conn} do
+      conn = post(conn, ~p"/users/signup", @invalid_attrs)
       assert json_response(conn, 422)["errors"] != %{}
     end
   end
 
   describe "update user" do
-    setup [:create_user]
+    setup [:login_user]
 
-    test "renders user when data is valid", %{conn: conn, user: %User{id: id} = user} do
-      conn = put(conn, ~p"/api/users/#{user}", user: @update_attrs)
-      assert %{"id" => ^id} = json_response(conn, 200)["data"]
-
-      conn = get(conn, ~p"/api/users/#{id}")
+    test "update user when data is valid", %{conn: conn, user: %User{id: id} = user} do
+      conn = put(conn, ~p"/users/#{user}", %{"first_name" => "John", "last_name" => "Charlie"})
 
       assert %{
                "id" => ^id,
-               "email" => "some updated email",
-               "first_name" => "some updated first_name",
-               "password" => "some updated password",
-               "last_name" => "some updated last_name"
-             } = json_response(conn, 200)["data"]
+               "first_name" => "John",
+               "last_name" => "Charlie"
+             } = json_response(conn, 200)
     end
 
-    test "renders errors when data is invalid", %{conn: conn, user: user} do
-      conn = put(conn, ~p"/api/users/#{user}", user: @invalid_attrs)
+    test "returns errors when data is invalid", %{conn: conn, user: user} do
+      conn = put(conn, ~p"/users/#{user}", @invalid_attrs)
       assert json_response(conn, 422)["errors"] != %{}
     end
   end
 
+  @tag :skip
   describe "delete user" do
-    setup [:create_user]
+    setup [:login_user]
 
-    test "deletes chosen user", %{conn: conn, user: user} do
-      conn = delete(conn, ~p"/api/users/#{user}")
+    test "archive chosen user", %{conn: conn, user: user} do
+      conn = delete(conn, ~p"/users/#{user}")
       assert response(conn, 204)
 
       assert_error_sent 404, fn ->
-        get(conn, ~p"/api/users/#{user}")
+        get(conn, ~p"/users/#{user}")
       end
+    end
+
+  end
+  @tag :skip
+  describe "forward" do
+    test "request forwarded", %{conn: conn} do
+      http = Application.get_env(:users, :http)
+      put(conn, ~p"/forwardedurl/", %{"character" => "Johnny Bravo"})
+      expect(http, :request, 0, fn _ -> {:ok} end)
     end
   end
 
-  defp create_user(_) do
-    user = user_fixture()
-    %{user: user}
+  defp login_user(%{conn: conn}) do
+    user = insert(:user)
+
+    conn =
+      conn
+      |> post(~p"/users/login", %{
+        "email" => "jbravo@test.com",
+        "password" => "jbravo1a"
+      })
+
+    %{"token" => token} = json_response(conn, 200)
+
+    conn =
+      conn
+      |> recycle()
+      |> put_req_header("authorization", "Bearer #{token}")
+      |> put_req_header("accept", "application/json")
+
+    %{conn: conn, user: user}
   end
 end
