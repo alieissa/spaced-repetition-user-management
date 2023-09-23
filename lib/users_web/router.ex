@@ -13,17 +13,18 @@ defmodule UsersWeb.Router do
 
   get "/health", UsersWeb.UserController, :health_check
 
-  scope "/deregister", UsersWeb do
+  scope "/users/deregister", UsersWeb do
     pipe_through [:api, :auth]
     get "/", UserController, :delete
   end
 
-  scope "/", UsersWeb do
+  scope "/users", UsersWeb do
     pipe_through [:api, :auth]
+    put "/:id", UserController, :update
     get "/logout", UserController, :logout
   end
 
-  scope "/", UsersWeb do
+  scope "/users", UsersWeb do
     pipe_through [:api]
 
     post "/signup", UserController, :create

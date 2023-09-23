@@ -7,6 +7,11 @@ defmodule UsersWeb.UserController do
 
   action_fallback UsersWeb.FallbackController
 
+  def action(conn, _) do
+    args = [conn, conn.path_params, conn.body_params]
+    apply(__MODULE__, action_name(conn), args)
+  end
+
   def index(conn, _) do
     users = Accounts.list_users()
     render(conn, :index, users: users)
@@ -17,7 +22,7 @@ defmodule UsersWeb.UserController do
     render(conn, :show, user: user)
   end
 
-  def update(conn, %{"id" => id, "user" => user_params}) do
+  def update(conn, %{"id" => id}, user_params) do
     user = Accounts.get_user!(id)
 
     with {:ok, %User{} = user} <- Accounts.update_user(user, user_params) do
@@ -33,7 +38,7 @@ defmodule UsersWeb.UserController do
     end
   end
 
-  def create(conn, user_params) do
+  def create(conn, _, user_params) do
     with {:ok, %User{} = user} <- Accounts.create_user(user_params),
          {:ok, token, _claims} <- Guardian.encode_and_sign(user) do
       conn
@@ -43,7 +48,7 @@ defmodule UsersWeb.UserController do
     end
   end
 
-  def login(conn, %{"email" => email, "password" => raw_password}) do
+  def login(conn, _, %{"email" => email, "password" => raw_password}) do
     case Guardian.authenticate(email, raw_password) do
       {:ok, token, _claims} ->
         conn
@@ -64,8 +69,9 @@ defmodule UsersWeb.UserController do
   end
 
   def forward(conn, _) do
+    http = Application.get_env(:users, :http)
     with app_request <- to_app_request!(conn),
-         {:ok, app_response} <- HTTPoison.request(app_request) do
+         {:ok, app_response} <- http.request(app_request) do
 
       conn
       |> resp(app_response.status_code, app_response.body)

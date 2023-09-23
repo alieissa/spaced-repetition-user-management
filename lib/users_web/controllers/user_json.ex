@@ -12,7 +12,7 @@ defmodule UsersWeb.UserJSON do
   Renders a single user.
   """
   def show(%{user: user}) do
-    %{data: data(user)}
+    data(user)
   end
 
   def token(%{token: token}) do
