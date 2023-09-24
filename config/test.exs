@@ -31,6 +31,7 @@ config :users, Redix,
   host: System.get_env("REDIS_HOST", "localhost"),
   name: :tokens
 
+config :users, Oban, testing: :inline
 # config :users, :http,
 #   Users.HTTPClientMock
 

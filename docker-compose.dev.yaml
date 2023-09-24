@@ -4,7 +4,10 @@ services:
     image: 079829475258.dkr.ecr.us-east-1.amazonaws.com/spaced-repetition-api
     ports:
       - "3000:3000"
-    entrypoint: npm start
+    environment:
+      DATABASE_URL: postgres://postgres:postgres@db:5432/users_dev
+      SECRET_KEY_BASE: fdj9324fjsdf012
+
   server:
     build: 
       context: .
@@ -15,9 +18,12 @@ services:
       - "4000:4000"
     environment:
       APP_ENDPOINT: http://app:3000
-      REDIS_ENDPOINT: redis
+      REDIS_HOST: redis
       DATABASE_URL: postgres://postgres:postgres@db:5432/users_dev
       SECRET_KEY_BASE: fdj9324fjsdf012
+      REGION: us-east-1
+      AWS_SES_ACCESS_KEY: xxxxxxxxxxxxxxxx
+      AWS_SES_SECRET_ACCESS_KEY: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
     entrypoint: ./init.sh
   redis:
     image: redis:7

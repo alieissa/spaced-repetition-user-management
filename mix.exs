@@ -47,7 +47,8 @@ defmodule Users.MixProject do
       {:ex_machina, "~> 2.7"},
       {:mox, "~> 1.1.0", only: :test},
       {:swoosh, "~> 1.0"},
-      {:gen_smtp, "~> 1.0"}
+      {:gen_smtp, "~> 1.0"},
+      {:oban, "~> 2.16"}
     ]
   end
 

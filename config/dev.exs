@@ -68,4 +68,6 @@ config :users, UsersWeb.Auth.Guardian,
   issues: "users_app",
   secret_key: secret_key_base
 
-config :users, Redix, System.get_env("REDIS_URL", "redis://redis:6379")
+config :users, Redix,
+  host: System.get_env("REDIS_HOST", "redis"),
+  name: :tokens

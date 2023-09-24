@@ -26,8 +26,18 @@ config :logger, :console,
   format: "$time $metadata[$level] $message\n",
   metadata: [:request_id]
 
-config :users, :http,
-  HTTPoison
+config :users, :http, HTTPoison
+
+config :users, Users.Mailer,
+  adapter: Swoosh.Adapters.AmazonSES,
+  region: "us-east-1",
+  access_key: System.get_env("AWS_ACCESS_KEY"),
+  secret: System.get_env("AWS_SECRET_ACCESS_KEY")
+
+config :users, Oban,
+  repo: Users.Repo,
+  plugins: [Oban.Plugins.Pruner],
+  queues: [default: 10, registration: 10]
 
 # Use Jason for JSON parsing in Phoenix
 config :phoenix, :json_library, Jason
