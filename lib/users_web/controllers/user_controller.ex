@@ -43,6 +43,14 @@ defmodule UsersWeb.UserController do
     send_resp(conn, :created, "Check your email for registration message.")
   end
 
+  def verify(conn, _, _) do
+    conn
+    |> Guardian.Plug.current_resource()
+    |> Accounts.verify_user()
+
+    send_resp(conn, :ok, "Verified")
+  end
+
   def login(conn, _, %{"email" => email, "password" => raw_password}) do
     case Guardian.authenticate(email, raw_password) do
       {:ok, token, _claims} ->

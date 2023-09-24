@@ -12,6 +12,11 @@ defmodule UsersWeb.Auth.Guardian do
     {:error, :no_id_provided}
   end
 
+  # The entire user is fetched.The entire user entity is
+  # needed for updates. Once update_all is used, only the
+  # the primary key, i.e. id will be needed
+  # See https://hexdocs.pm/ecto/Ecto.Repo.html#c:update_all/3
+  # See https://elixirforum.com/t/ecto-why-repo-get-before-repo-update/12043/2
   def resource_from_claims(%{"sub" => id}) do
     case Accounts.get_user!(id) do
       nil -> {:error, :user_not_found}

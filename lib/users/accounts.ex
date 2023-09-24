@@ -75,6 +75,24 @@ defmodule Users.Accounts do
   end
 
   @doc """
+  Verifies a user.
+
+  ## Examples
+
+      iex> verify_user(user)
+      {:ok, %User{}}
+
+      iex> update_user(user, %{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def verify_user(user) do
+    user
+    |> User.changeset(%{verified: true})
+    |> Repo.update()
+  end
+
+  @doc """
   Updates a user.
 
   ## Examples
