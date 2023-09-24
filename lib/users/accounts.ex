@@ -120,4 +120,11 @@ defmodule Users.Accounts do
   def change_user(%User{} = user, attrs \\ %{}) do
     User.changeset(user, attrs)
   end
+
+  def validate_user(%{} = attrs) do
+    case User.changeset(%User{}, attrs) do
+      %Ecto.Changeset{valid?: true, changes: user} -> {:ok, user: user}
+      _ -> {:error, :invalid}
+    end
+  end
 end
