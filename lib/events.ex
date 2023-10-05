@@ -5,8 +5,8 @@ defmodule Users.Events do
   alias UsersWeb.Auth.Guardian
 
   @impl Oban.Worker
-  def perform(%Oban.Job{args: %{"email" => email} = user_params}) do
-    with {:ok, %User{} = user} <- Accounts.create_user(user_params),
+  def perform(%Oban.Job{args: %{"email" => email}}) do
+    with %User{} = user <- Accounts.get_user_by_email(email),
          {:ok, token, _claims} <- Guardian.encode_and_sign(user, %{"verified" => false, "email" => email}),
          _ <- Users.Email.welcome(user: user, token: token) do
       :ok

@@ -1,5 +1,3 @@
-# TODO
-# 1. Add no route error handler, and test it.
 defmodule UsersWeb.UserControllerTest do
   use UsersWeb.ConnCase
 
@@ -7,7 +5,7 @@ defmodule UsersWeb.UserControllerTest do
   import Users.Factory
   alias Users.Accounts.User
 
-  @invalid_attrs %{password: nil, email: nil, first_name: nil, last_name: nil}
+  @invalid_attrs %{ email: "invalidemail", first_name: nil, last_name: nil}
 
   setup %{conn: conn} do
     {:ok, conn: put_req_header(conn, "accept", "application/json")}
@@ -16,17 +14,17 @@ defmodule UsersWeb.UserControllerTest do
   describe "create user" do
     test "create user when data is valid", %{conn: conn} do
       conn =
-        post(conn, ~p"/users/signup", %{
+        post(conn, ~p"/users/register", %{
           password: "jbravo01",
           email: "jbravo@test.com"
         })
 
-      assert %{"token" => _token} = json_response(conn, 201)
+      assert _ = response(conn, 201)
     end
 
     test "return errors when data is invalid", %{conn: conn} do
-      conn = post(conn, ~p"/users/signup", @invalid_attrs)
-      assert json_response(conn, 422)["errors"] != %{}
+      conn = post(conn, ~p"/users/register", @invalid_attrs)
+      assert _ = response(conn, 422)
     end
   end
 
@@ -57,13 +55,12 @@ defmodule UsersWeb.UserControllerTest do
       conn = delete(conn, ~p"/users/#{user}")
       assert response(conn, 204)
 
-      assert_error_sent 404, fn ->
+      assert_error_sent(404, fn ->
         get(conn, ~p"/users/#{user}")
-      end
+      end)
     end
-
   end
-  @tag :skip
+
   describe "forward" do
     test "request forwarded", %{conn: conn} do
       http = Application.get_env(:users, :http)
@@ -73,14 +70,18 @@ defmodule UsersWeb.UserControllerTest do
   end
 
   defp login_user(%{conn: conn}) do
-    user = insert(:user)
+    user_data = %{
+      "email" => "jbravo@test.com",
+      "password" => "jbravo1a"
+    }
+
+    user =
+      insert(:user, verified: true, email: user_data["email"], password: user_data["password"])
 
     conn =
       conn
-      |> post(~p"/users/login", %{
-        "email" => "jbravo@test.com",
-        "password" => "jbravo1a"
-      })
+      |> recycle()
+      |> post(~p"/users/login", user_data)
 
     %{"token" => token} = json_response(conn, 200)
 

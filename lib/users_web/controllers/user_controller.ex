@@ -39,8 +39,15 @@ defmodule UsersWeb.UserController do
   end
 
   def create(conn, _, user_params) do
-    Events.new_user(user_params)
-    send_resp(conn, :created, "Check your email for registration message.")
+    case Accounts.create_user(user_params) do
+      { :ok, %User{} = user } ->
+        Events.new_user(user_params)
+        conn
+        |> put_status(:created)
+        |> render(:show, user: user)
+        # TODO return a better error message
+      {:error, _} -> send_resp(conn, 422, "error")
+    end
   end
 
   def verify(conn, _, _) do
