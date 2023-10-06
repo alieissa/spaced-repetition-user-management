@@ -4,11 +4,21 @@ defmodule UsersWeb.UserControllerTest do
   import Mox
   import Users.Factory
   alias Users.Accounts.User
+  alias UsersWeb.Auth.Guardian
 
-  @invalid_attrs %{ email: "invalidemail", first_name: nil, last_name: nil}
+  @invalid_attrs %{email: "invalidemail", first_name: nil, last_name: nil}
 
   setup %{conn: conn} do
     {:ok, conn: put_req_header(conn, "accept", "application/json")}
+  end
+
+  describe "verify user" do
+    setup [:create_unverified_user_conn]
+
+    test "should verify user when token is valid", %{conn: conn} do
+      conn = get(conn, ~p"/users/verify")
+      assert "Your email has been verified.You can now login." = response(conn, 200)
+    end
   end
 
   describe "create user" do
@@ -29,7 +39,7 @@ defmodule UsersWeb.UserControllerTest do
   end
 
   describe "update user" do
-    setup [:login_user]
+    setup [:create_verified_user_conn]
 
     test "update user when data is valid", %{conn: conn, user: %User{id: id} = user} do
       conn = put(conn, ~p"/users/#{user}", %{"first_name" => "John", "last_name" => "Charlie"})
@@ -49,7 +59,7 @@ defmodule UsersWeb.UserControllerTest do
 
   @tag :skip
   describe "delete user" do
-    setup [:login_user]
+    setup [:create_verified_user_conn]
 
     test "archive chosen user", %{conn: conn, user: user} do
       conn = delete(conn, ~p"/users/#{user}")
@@ -69,21 +79,15 @@ defmodule UsersWeb.UserControllerTest do
     end
   end
 
-  defp login_user(%{conn: conn}) do
-    user_data = %{
-      "email" => "jbravo@test.com",
-      "password" => "jbravo1a"
-    }
-
+  defp create_user_conn(%{conn: conn, user_data: user_params}) do
     user =
-      insert(:user, verified: true, email: user_data["email"], password: user_data["password"])
+      insert(:user,
+        verified: user_params.verified,
+        email: user_params.email,
+        password: user_params.password
+      )
 
-    conn =
-      conn
-      |> recycle()
-      |> post(~p"/users/login", user_data)
-
-    %{"token" => token} = json_response(conn, 200)
+    {:ok, token, user} = Guardian.get_token(user.email)
 
     conn =
       conn
@@ -92,5 +96,25 @@ defmodule UsersWeb.UserControllerTest do
       |> put_req_header("accept", "application/json")
 
     %{conn: conn, user: user}
+  end
+
+  defp create_unverified_user_conn(%{conn: conn}) do
+    user_data = %{
+      email: "jbravo@test.com",
+      password: "jbravo1a",
+      verified: false
+    }
+
+    create_user_conn(%{conn: conn, user_data: user_data})
+  end
+
+  defp create_verified_user_conn(%{conn: conn}) do
+    user_data = %{
+      email: "jbravo@test.com",
+      password: "jbravo1a",
+      verified: true
+    }
+
+    create_user_conn(%{conn: conn, user_data: user_data})
   end
 end

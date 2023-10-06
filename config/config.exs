@@ -11,7 +11,6 @@ config :users, UsersWeb.Endpoint,
     formats: [json: UsersWeb.ErrorJSON],
     layout: false
   ]
-  # pubsub_server: Users.PubSub
 
 # Configures Elixir's Logger
 config :logger, :console,

@@ -43,10 +43,9 @@ config :users, UsersWeb.Auth.Guardian,
   issues: "users_app",
   secret_key: secret_key_base
 
-redis_endpoint = System.get_env("REDIS_ENDPOINT", "redis")
-
+redis_host = System.get_env("REDIS_HOST", "redis")
 config :users, Redix,
-  host: redis_endpoint,
+  host: redis_host,
   name: :tokens
 
 if config_env() !== :test do

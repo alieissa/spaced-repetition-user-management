@@ -35,7 +35,7 @@ services:
       - .env.dev
     environment:
       APP_ENDPOINT: http://api:3000
-      REDIS_ENDPOINT: redis
+      REDIS_HOST: redis
       POSTGRES_HOSTNAME: db
       POSTGRES_PASSWORD: postgres
       DB_NAME: spaced_repetition

@@ -1,13 +1,11 @@
 defmodule Users.Events do
   use Oban.Worker, queue: :registration
 
-  alias Users.{Accounts, Accounts.User}
   alias UsersWeb.Auth.Guardian
 
   @impl Oban.Worker
   def perform(%Oban.Job{args: %{"email" => email}}) do
-    with %User{} = user <- Accounts.get_user_by_email(email),
-         {:ok, token, _claims} <- Guardian.encode_and_sign(user, %{"verified" => false, "email" => email}),
+    with {:ok, token, user} <- Guardian.get_token(email),
          _ <- Users.Email.welcome(user: user, token: token) do
       :ok
     end

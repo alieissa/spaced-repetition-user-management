@@ -55,7 +55,7 @@ defmodule UsersWeb.UserController do
     |> Guardian.Plug.current_resource()
     |> Accounts.verify_user()
 
-    send_resp(conn, :ok, "Verified")
+    send_resp(conn, :ok, "Your email has been verified.You can now login.")
   end
 
   def login(conn, _, %{"email" => email, "password" => raw_password}) do
@@ -80,7 +80,6 @@ defmodule UsersWeb.UserController do
 
   def forward(conn, _) do
     http = Application.get_env(:users, :http)
-
     with app_request <- to_app_request!(conn),
          {:ok, app_response} <- http.request(app_request) do
       conn
