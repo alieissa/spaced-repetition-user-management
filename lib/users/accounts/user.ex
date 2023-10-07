@@ -5,13 +5,17 @@ defmodule Users.Accounts.User do
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
   schema "users" do
-    field :password, :string
-    field :email, :string
-    field :first_name, :string
-    field :last_name, :string
+    field(:password, :string)
+    field(:email, :string)
+    field(:first_name, :string)
+    field(:last_name, :string)
+    field(:verified, :boolean)
 
     timestamps()
   end
+
+  @doc false
+  def changeset(user, %{verified: true} = attrs), do: cast(user, attrs, [:verified])
 
   @doc false
   def changeset(user, attrs) do
@@ -25,7 +29,7 @@ defmodule Users.Accounts.User do
     |> hash_password()
   end
 
-  defp hash_password(%Ecto.Changeset{valid?: true, changes: %{ password: password }} = changeset) do
+  defp hash_password(%Ecto.Changeset{valid?: true, changes: %{password: password}} = changeset) do
     change(changeset, password: Bcrypt.hash_pwd_salt(password))
   end
 

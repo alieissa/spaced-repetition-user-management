@@ -45,7 +45,10 @@ defmodule Users.MixProject do
       {:httpoison, "~> 2.1"},
       {:redix, "~> 1.2"},
       {:ex_machina, "~> 2.7"},
-      {:mox, "~> 1.1.0", only: :test}
+      {:mox, "~> 1.1.0", only: :test},
+      {:swoosh, "~> 1.0"},
+      {:gen_smtp, "~> 1.0"},
+      {:oban, "~> 2.16"}
     ]
   end
 

@@ -12,6 +12,8 @@ defmodule Users.Application do
       UsersWeb.Telemetry,
       # Start the Ecto repository
       Users.Repo,
+      # Queue for mail
+      {Oban, Application.fetch_env!(:users, Oban)},
       # Start Redix worker
       {Redix, Application.fetch_env!(:users, Redix)},
       # Start the PubSub system

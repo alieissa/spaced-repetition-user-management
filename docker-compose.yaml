@@ -1,27 +1,42 @@
-version: "3.9"  # optional since v1.27.0
+# @format
+
+version: '3.9' # optional since v1.27.0
 services:
-  app:
-    image: 079829475258.dkr.ecr.us-east-1.amazonaws.com/spaced-repetition-api
-    ports:
-      - "3000:3000"
-    entrypoint: npm start
-  server:
-    build: 
-      context: .
-    ports: 
-      - "4000:4000"
-    environment:
-      APP_ENDPOINT: http://app:3000
-      REDIS_ENDPOINT: redis
-      DATABASE_URL: postgres://postgres:postgres@db:5432/users_dev
-      SECRET_KEY_BASE: fdj9324fjsdf012
   redis:
     image: redis:7
     ports:
-      - "6379:6379"
+      - 6379:6379
+
   db:
-    image: postgres
+    image: postgres:14.7
     ports:
-      - "5432:5432"
+      - 5432:5432
     environment:
       POSTGRES_PASSWORD: postgres
+
+  api:
+    depends_on:
+      - db
+    image: 079829475258.dkr.ecr.us-east-1.amazonaws.com/spaced-repetition-api
+    ports:
+      - 3000:3000
+
+  auth:
+    depends_on:
+      - db
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    volumes:
+      - ./:/app
+    ports:
+      - 4000:4000
+    env_file:
+      - .env.dev
+    environment:
+      APP_ENDPOINT: http://api:3000
+      REDIS_HOST: redis
+      POSTGRES_HOSTNAME: db
+      POSTGRES_PASSWORD: postgres
+      DB_NAME: spaced_repetition
+    entrypoint: ./init.sh
