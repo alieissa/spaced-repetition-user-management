@@ -2,6 +2,9 @@ on:
   pull_request:
     branches:
       - main
+  push:
+    branches:
+      - fix-db-connection-error
 env:
   REPO: 079829475258.dkr.ecr.us-east-1.amazonaws.com
   IMAGE_NAME: spaced-repetition-user-management
@@ -46,6 +49,8 @@ jobs:
           POSTGRES_PASSWORD: postgres
           POSTGRES_HOSTNAME: localhost
           REDIS_HOST: localhost
+          # "ecto://${data.aws_ssm_parameter.db_username.value}:${data.aws_ssm_parameter.db_password.value}@${var.db_hostname}:5432/${data.aws_ssm_parameter.db_name.value}"
+          DATABASE_URL: ecto://postgres:postgres@localhost:5432/spaced_repetition
           SECRET_KEY_BASE: 'dummysecretkeybase1234'
     
   build:
