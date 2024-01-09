@@ -20,6 +20,13 @@ services:
     image: 079829475258.dkr.ecr.us-east-1.amazonaws.com/spaced-repetition-api
     ports:
       - 3000:3000
+    env_file:
+      - .env.dev
+    environment:
+      POSTGRES_HOSTNAME: db
+      POSTGRES_PASSWORD: postgres
+      DB_NAME: spaced_repetition
+      DATABASE_URL: ecto://postgres:postgres@db/spaced_repetition
 
   auth:
     depends_on:

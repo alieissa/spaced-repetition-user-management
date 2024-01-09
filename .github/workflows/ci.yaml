@@ -48,10 +48,11 @@ jobs:
           REDIS_HOST: localhost
           SECRET_KEY_BASE: 'dummysecretkeybase1234'
     
-  build:
+  release:
     needs: tests
+    if: github.event.pull_request.merged == true
     runs-on: ubuntu-20.04
-    name: Build
+    name: Release
     strategy:
       matrix:
         otp: ['25.2.3']
