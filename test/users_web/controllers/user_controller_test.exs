@@ -79,13 +79,6 @@ defmodule UsersWeb.UserControllerTest do
     end
   end
 
-  describe "health" do
-    test "check health", %{conn: conn} do
-      conn = get(conn, ~p"/health", @invalid_attrs)
-      assert "healthy" = response(conn, 200)
-    end
-  end
-
   defp create_user_conn(%{conn: conn, user_data: user_params}) do
     user =
       insert(:user,

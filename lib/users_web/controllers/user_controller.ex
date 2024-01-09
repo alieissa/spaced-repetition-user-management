@@ -78,9 +78,8 @@ defmodule UsersWeb.UserController do
     send_resp(conn, :ok, "Logout")
   end
 
-  def forward(conn, _, _) do
+  def forward(conn, _) do
     http = Application.get_env(:users, :http)
-
     with app_request <- to_app_request!(conn),
          {:ok, app_response} <- http.request(app_request) do
       conn
@@ -89,7 +88,7 @@ defmodule UsersWeb.UserController do
     end
   end
 
-  def health_check(conn, _, _) do
+  def health_check(conn, _) do
     send_resp(conn, :ok, "healthy")
   end
 
