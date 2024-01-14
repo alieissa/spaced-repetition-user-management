@@ -2,9 +2,12 @@ defmodule Users.Email do
   import Swoosh.Email
 
   def welcome(user: user, token: token) do
-    app_endpoit = System.get_env("APP_ENDPOINT")
-    verify_url = "#{app_endpoit}/users/verify?token=#{token}"
-    html_body = "Thank you for signing up. Please click <a href=#{verify_url}>here</a> to verify your email"
+    verification_url = System.get_env("VERIFICATION_URL")
+    verification_link = "#{verification_url}/verify?token=#{token}"
+
+    html_body =
+      "Thank you for signing up. Please click <a href=#{verification_link}>here</a> to verify your email"
+
     new()
     |> to(user.email)
     |> from("info@spaced-reps.com")

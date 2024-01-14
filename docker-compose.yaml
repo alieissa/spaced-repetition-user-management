@@ -44,6 +44,7 @@ services:
     env_file:
       - .env.dev
     environment:
+      VERIFICATION_URL: localhost:5000
       APP_ENDPOINT: http://api:3000
       REDIS_HOST: redis
       POSTGRES_HOSTNAME: db
