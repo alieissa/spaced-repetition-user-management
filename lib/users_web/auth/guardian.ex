@@ -3,7 +3,6 @@ defmodule UsersWeb.Auth.Guardian do
 
   alias Users.{Accounts, Accounts.User}
 
-
   def subject_for_token(%{id: id}, _claims) do
     sub = to_string(id)
     {:ok, sub}
@@ -43,10 +42,11 @@ defmodule UsersWeb.Auth.Guardian do
   # see the UsersWeb.Auth.Pipeline.Verified
   def authenticate(email, password) do
     case get_token(email) do
-      {:ok, token, %{verified: true} = user } ->
+      {:ok, token, %{verified: true} = user} ->
         if Bcrypt.verify_pass(password, user.password),
-          do: token,
+          do: {:ok, token, user},
           else: {:error, :unauthorized}
+
       _ ->
         {:error, :unauthorized}
     end
