@@ -71,6 +71,18 @@ defmodule UsersWeb.UserControllerTest do
     end
   end
 
+  describe "login user" do
+    setup [:create_verified_user_conn]
+
+    test "login", %{conn: conn, user: _user} do
+      # Email and password are creds of verified user
+      conn =
+        post(conn, ~p"/users/login", %{"email" => "jbravo@test.com", "password" => "jbravo1a"})
+
+      assert response(conn, 200)
+    end
+  end
+
   describe "forward" do
     test "request forwarded", %{conn: conn} do
       http = Application.get_env(:users, :http)
