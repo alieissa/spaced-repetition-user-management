@@ -48,7 +48,8 @@ defmodule Users.MixProject do
       {:mox, "~> 1.1.0", only: :test},
       {:swoosh, "~> 1.0"},
       {:gen_smtp, "~> 1.0"},
-      {:oban, "~> 2.16"}
+      {:oban, "~> 2.16"},
+      {:cors_plug, "~> 3.0"}
     ]
   end
 
