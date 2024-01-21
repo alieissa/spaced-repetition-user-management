@@ -17,6 +17,10 @@ config :users, UsersWeb.Endpoint,
   http: [ip: {0, 0, 0, 0}, port: port],
   secret_key_base: secret_key_base
 
+config :users, UsersWeb.Auth.Guardian,
+  issues: "users_app",
+  secret_key: secret_key_base
+
 config :users, Oban,
   repo: Users.Repo,
   plugins: [Oban.Plugins.Pruner],
