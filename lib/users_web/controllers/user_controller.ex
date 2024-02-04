@@ -70,7 +70,7 @@ defmodule UsersWeb.UserController do
     end
   end
 
-  def logout(conn, _) do
+  def logout(conn, _, _) do
     conn
     |> get_req_header("authorization")
     |> Tokens.blacklist!()

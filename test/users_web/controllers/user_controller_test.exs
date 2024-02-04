@@ -81,6 +81,12 @@ defmodule UsersWeb.UserControllerTest do
 
       assert response(conn, 200)
     end
+
+    test("logout", %{conn: conn}) do
+      conn = get(conn, ~p"/users/logout")
+
+      assert response(conn, 200)
+    end
   end
 
   describe "forward" do
