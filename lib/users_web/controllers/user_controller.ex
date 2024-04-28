@@ -93,19 +93,45 @@ defmodule UsersWeb.UserController do
     send_resp(conn, :ok, "healthy")
   end
 
-  defp to_app_request!(conn) do
-    path = conn.request_path
+  '''
+  More than any other piece logic this function makes it very clear that having
+  an Elixir service as an API Gateway is not the the best option.
+  '''
+
+  defp to_app_request!(%Plug.Conn{params: %{"filename" => %Plug.Upload{}}} = conn) do
     method = String.to_atom(String.downcase(conn.method))
-    headers = conn.req_headers
-    params = conn.query_params
-    body = Jason.encode!(conn.body_params)
-    url = "#{System.get_env("APP_ENDPOINT")}#{path}"
+    url = "#{System.get_env("APP_ENDPOINT")}#{conn.request_path}"
+
+    %Plug.Upload{
+      path: file_path,
+      content_type: file_content_type,
+      filename: filename
+    } = conn.body_params["filename"]
+
+    form = [
+      {:file, file_path, {"form-data", [name: "data", filename: filename]},
+       [{"Content-Type", file_content_type}]}
+    ]
 
     %HTTPoison.Request{
       url: url,
       method: method,
-      headers: headers,
-      params: params,
+      headers: conn.req_headers,
+      params: conn.query_params,
+      body: {:multipart, form}
+    }
+  end
+
+  defp to_app_request!(conn) do
+    method = String.to_atom(String.downcase(conn.method))
+    url = "#{System.get_env("APP_ENDPOINT")}#{conn.request_path}"
+    body = Jason.encode!(conn.body_params)
+
+    %HTTPoison.Request{
+      url: url,
+      method: method,
+      headers: conn.req_headers,
+      params: conn.query_params,
       body: body
     }
   end
