@@ -96,11 +96,6 @@ defmodule UsersWeb.UserController do
     send_resp(conn, :ok, "healthy")
   end
 
-  '''
-  More than any other piece logic this function makes it very clear that having
-  an Elixir service as an API Gateway is not the the best option.
-  '''
-
   defp to_app_request!(%Plug.Conn{params: %{"filename" => %Plug.Upload{}}} = conn) do
     method = String.to_atom(String.downcase(conn.method))
     url = "#{System.get_env("APP_ENDPOINT")}#{conn.request_path}"
