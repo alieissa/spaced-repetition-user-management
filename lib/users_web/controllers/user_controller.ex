@@ -40,13 +40,16 @@ defmodule UsersWeb.UserController do
 
   def create(conn, _, user_params) do
     case Accounts.create_user(user_params) do
-      { :ok, %User{} = user } ->
+      {:ok, %User{} = user} ->
         Events.new_user(user_params)
+
         conn
         |> put_status(:created)
         |> render(:show, user: user)
-        # TODO return a better error message
-      {:error, _} -> send_resp(conn, 422, "error")
+
+      # TODO return a better error message
+      {:error, _} ->
+        send_resp(conn, 422, "error")
     end
   end
 
@@ -109,7 +112,7 @@ defmodule UsersWeb.UserController do
     } = conn.body_params["filename"]
 
     form = [
-      {:file, file_path, {"form-data", [name: "data", filename: filename]},
+      {:file, file_path, {"form-data", [name: "file", filename: filename]},
        [{"Content-Type", file_content_type}]}
     ]
 
