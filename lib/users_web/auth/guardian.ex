@@ -18,7 +18,7 @@ defmodule UsersWeb.Auth.Guardian do
   # See https://hexdocs.pm/ecto/Ecto.Repo.html#c:update_all/3
   # See https://elixirforum.com/t/ecto-why-repo-get-before-repo-update/12043/2
   def resource_from_claims(%{"sub" => id}) do
-    case Accounts.get_user!(id) do
+    case Accounts.get_user(id) do
       nil -> {:error, :user_not_found}
       user -> {:ok, user}
     end

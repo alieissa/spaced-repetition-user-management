@@ -15,7 +15,9 @@ port = String.to_integer(System.get_env("PORT", "4000"))
 
 config :users, UsersWeb.Endpoint,
   http: [ip: {0, 0, 0, 0}, port: port],
-  secret_key_base: secret_key_base
+  secret_key_base: secret_key_base,
+  code_reloader: true,
+  debug_errors: true
 
 config :users, UsersWeb.Auth.Guardian,
   issues: "users_app",
@@ -34,7 +36,8 @@ config :users, Redix,
 
 config :users, Users.Mailer,
   adapter: Swoosh.Adapters.AmazonSES,
-  region: System.get_env("REGION", "us-east-1"),
+  region: System.get_env("AWS_REGION", "us-east-1"),
+  # TODO Move keys to runtime.exs
   access_key: System.get_env("AWS_SES_ACCESS_KEY"),
   secret: System.get_env("AWS_SES_SECRET_ACCESS_KEY")
 
