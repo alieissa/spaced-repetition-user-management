@@ -5,8 +5,9 @@ defmodule Users.Events do
 
   @impl Oban.Worker
   def perform(%Oban.Job{args: %{"email" => email}}) do
-    with {:ok, token, user} <- Guardian.get_token(email) do
-      Users.Email.welcome(user: user, token: token)
+    with {:ok, token, user} <- Guardian.get_token(email),
+         _ <- Users.Email.welcome(user: user, token: token) do
+      :ok
     end
   end
 
