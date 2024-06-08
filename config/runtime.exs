@@ -51,9 +51,9 @@ if config_env() == :prod do
     host: redis_host,
     name: :tokens
 
-  # config :users, Users.Mailer,
-  #   adapter: Swoosh.Adapters.AmazonSES,
-  #   region: System.get_env("REGION"),
-  #   access_key: System.get_env("AWS_SES_ACCESS_KEY"),
-  #   secret: System.get_env("AWS_SES_SECRET_ACCESS_KEY")
+  config :users, Users.Mailer,
+    adapter: Swoosh.Adapters.AmazonSES,
+    region: System.get_env("REGION"),
+    access_key: System.get_env("AWS_SES_ACCESS_KEY"),
+    secret: System.get_env("AWS_SES_SECRET_ACCESS_KEY")
 end
