@@ -86,8 +86,6 @@ defmodule UsersWeb.UserController do
 
     with app_request <- to_app_request!(conn),
          {:ok, app_response} <- http.request(app_request) do
-      IO.inspect(app_response)
-
       conn
       |> resp(app_response.status_code, app_response.body)
       |> send_resp()
