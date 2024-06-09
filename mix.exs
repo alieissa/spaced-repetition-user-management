@@ -49,7 +49,8 @@ defmodule Users.MixProject do
       {:swoosh, "~> 1.0"},
       {:gen_smtp, "~> 1.0"},
       {:oban, "~> 2.16"},
-      {:cors_plug, "~> 3.0"}
+      {:cors_plug, "~> 3.0"},
+      {:credo, "~> 1.7", only: [:dev, :test], runtime: false}
     ]
   end
 
