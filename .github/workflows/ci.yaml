@@ -3,9 +3,7 @@ on:
     types: [opened, synchronize, closed]
     branches:
       - main
-  push:
-    branches:
-      - 28-add-linter-to-cicd
+
 env:
   REPO: 079829475258.dkr.ecr.us-east-1.amazonaws.com
   IMAGE_NAME: spaced-repetition-user-management
