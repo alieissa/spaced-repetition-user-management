@@ -3,7 +3,7 @@ defmodule Users.Email do
 
   def welcome(user: user, token: token) do
     verification_url = System.get_env("VERIFICATION_URL")
-    verification_link = "#{verification_url}/verify?token=#{token}"
+    verification_link = "#{verification_url}?token=#{token}"
 
     html_body =
       "Thank you for signing up. Please click <a href=#{verification_link}>here</a> to verify your email"
