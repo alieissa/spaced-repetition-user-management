@@ -20,36 +20,35 @@ if System.get_env("PHX_SERVER") do
   config :users, UsersWeb.Endpoint, server: true
 end
 
-if config_env() == :prod do
-  config :users, Users.Repo,
-    database: System.get_env("DB_NAME", "spaced_repetition"),
-    username: System.get_env("DB_USERNAME", "postgres"),
-    password: System.get_env("DB_PASSWORD", "postgres"),
-    hostname: System.get_env("POSTGRES_HOSTNAME"),
-    pool_size: 10
-
-  config :users, Oban,
-    repo: Users.Repo,
-    plugins: [Oban.Plugins.Pruner],
-    queues: [default: 10, registration: 10]
-
+if config_env() == :prod || config_env() == :dev do
   secret_key_base = System.get_env("SECRET_KEY_BASE")
 
-  port = String.to_integer(System.get_env("PORT", "4000"))
-
   config :users, UsersWeb.Endpoint,
-    http: [ip: {0, 0, 0, 0}, port: port],
+    http: [ip: {0, 0, 0, 0}, port: String.to_integer(System.get_env("PORT", "4000"))],
     secret_key_base: secret_key_base
+
+  config :users, Users.Repo,
+    hostname:
+      System.get_env("DB_HOSTNAME") || raise("Environment variable DB_HOSTNAME is not set."),
+    database: System.get_env("DB_NAME") || raise("Environment variable DB_NAME is not set."),
+    username:
+      System.get_env("DB_USERNAME") || raise("Environment variable DB_USERNAME is not set."),
+    password:
+      System.get_env("DB_PASSWORD") || raise("Environment variable DB_PASSWORD is not set."),
+    pool_size: 10
 
   config :users, UsersWeb.Auth.Guardian,
     issues: "users_app",
     secret_key: secret_key_base
 
-  redis_host = System.get_env("REDIS_HOST", "redis")
-
   config :users, Redix,
-    host: redis_host,
+    host: System.get_env("CACHE_HOST") || raise("Environment variable CACHE_HOST is not set."),
     name: :tokens
+
+  config :users, Oban,
+    repo: Users.Repo,
+    plugins: [Oban.Plugins.Pruner],
+    queues: [default: 10, registration: 10]
 
   config :users, Users.Mailer,
     adapter: Swoosh.Adapters.AmazonSES,
