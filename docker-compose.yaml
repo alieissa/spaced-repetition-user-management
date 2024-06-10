@@ -15,6 +15,8 @@ services:
       - ./db:/docker-entrypoint-initdb.d/
     env_file:
       - .env.dev
+    environment:
+      - POSTGRES_PASSWORD=postgres
 
   api:
     depends_on:
