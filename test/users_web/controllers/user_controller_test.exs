@@ -4,7 +4,7 @@ defmodule UsersWeb.UserControllerTest do
   import Mox
   import Users.Factory
   alias Users.Accounts.User
-  alias UsersWeb.Auth.Guardian
+  alias UsersWeb.Auth
 
   @invalid_attrs %{email: "invalidemail", first_name: nil, last_name: nil}
 
@@ -42,7 +42,7 @@ defmodule UsersWeb.UserControllerTest do
     setup [:create_verified_user_conn]
 
     test "update user when data is valid", %{conn: conn, user: %User{id: id} = user} do
-      conn = put(conn, ~p"/users/#{user}", %{"first_name" => "John", "last_name" => "Charlie"})
+      conn = put(conn, ~p"/users/#{id}", %{"first_name" => "John", "last_name" => "Charlie"})
 
       assert %{
                "id" => ^id,
@@ -112,7 +112,7 @@ defmodule UsersWeb.UserControllerTest do
         password: user_params.password
       )
 
-    {:ok, token, user} = Guardian.get_token(user.email)
+    {:ok, token, _} = Auth.get_token(user)
 
     conn =
       conn

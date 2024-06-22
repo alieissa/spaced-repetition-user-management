@@ -2,8 +2,8 @@ defmodule UsersWeb.UserController do
   use UsersWeb, :controller
   import Plug.Conn
 
-  alias UsersWeb.Auth.{Guardian, ErrorResponse}
-  alias Users.{Accounts, Accounts.User, Tokens}
+  alias UsersWeb.Auth
+  alias Users.Accounts
   alias Users.Events
 
   action_fallback UsersWeb.FallbackController
@@ -25,7 +25,8 @@ defmodule UsersWeb.UserController do
 
   def update(conn, _, user_params) do
     user = Guardian.Plug.current_resource(conn)
-    with {:ok, %User{} = user} <- Accounts.update_user(user, user_params) do
+
+    with {:ok, user} <- Accounts.update_user(user, user_params) do
       render(conn, :show, user: user)
     end
   end
@@ -33,23 +34,19 @@ defmodule UsersWeb.UserController do
   def delete(conn, _) do
     user = Guardian.Plug.current_resource(conn)
 
-    with {:ok, %User{}} <- Accounts.delete_user(user) do
+    with {:ok, _} <- Accounts.delete_user(user) do
       send_resp(conn, :no_content, "")
     end
   end
 
   def create(conn, _, user_params) do
-    case Accounts.create_user(user_params) do
-      {:ok, %User{} = user} ->
-        Events.new_user(user_params)
+    with {:ok, user} <- Accounts.create_user(user_params),
+         {:ok, token, _} <- Auth.get_token(user) do
+      Events.new_user(%{email: user.email, token: token})
 
-        conn
-        |> put_status(:created)
-        |> render(:show, user: user)
-
-      # TODO return a better error message
-      {:error, _} ->
-        send_resp(conn, 422, "error")
+      conn
+      |> put_status(:created)
+      |> render(:show, user: user)
     end
   end
 
@@ -62,21 +59,18 @@ defmodule UsersWeb.UserController do
   end
 
   def login(conn, _, %{"email" => email, "password" => raw_password}) do
-    case Guardian.authenticate(email, raw_password) do
-      {:ok, token, _claims} ->
-        conn
-        |> put_status(:ok)
-        |> render(:token, token: token)
-
-      {:error, :unauthorized} ->
-        raise ErrorResponse.Unauthorized
+    with {:ok, user} <- Accounts.get_verified_user(email),
+         {:ok, token, _} <- Auth.get_verified_token(raw_password, user) do
+      conn
+      |> put_status(:ok)
+      |> render(:token, token: token)
     end
   end
 
   def logout(conn, _, _) do
     conn
     |> get_req_header("authorization")
-    |> Tokens.blacklist!()
+    |> Auth.blacklist_token()
 
     send_resp(conn, :ok, "Logout")
   end
