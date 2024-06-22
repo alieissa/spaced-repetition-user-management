@@ -29,7 +29,7 @@ config :users, Oban,
 
 config :users, :http, Users.HTTPClientMock
 
-config :users, UsersWeb.Auth.Guardian,
+config :users, UsersWeb.Auth,
   issues: "users_app",
   secret_key: secret_key_base
 

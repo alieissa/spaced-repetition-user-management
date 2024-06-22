@@ -14,8 +14,6 @@ defmodule UsersWeb.Router do
     plug UsersWeb.Auth.Pipeline.Unverified
   end
 
-  get "/health", UsersWeb.UserController, :health_check
-
   scope "/users", UsersWeb do
     pipe_through :register
     get "/verify", UserController, :verify
