@@ -56,6 +56,16 @@ defmodule Users.Accounts do
     |> Repo.one()
   end
 
+  def get_verified_user(email) do
+    query = from u in User, where: u.email == ^email and u.verified == true
+
+    case Repo.one(query) do
+      %User{verified: true} = user -> {:ok, user}
+      %User{verified: false} -> {:error, "User not verified."}
+      nil -> {:error, "User not found."}
+    end
+  end
+
   @doc """
   Creates a user.
 
