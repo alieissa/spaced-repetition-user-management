@@ -1,5 +1,6 @@
 defmodule UsersWeb.UserControllerTest do
   use UsersWeb.ConnCase
+  use Oban.Testing, repo: Users.Repo
 
   import Mox
   import Users.Factory
@@ -89,6 +90,34 @@ defmodule UsersWeb.UserControllerTest do
     end
   end
 
+  describe "POST /users/forgot-password" do
+    @tag :wip
+    test "when user is registered", %{conn: conn} do
+      %{conn: conn, user: user} = create_verified_user_conn(%{conn: conn})
+
+      conn = forgot_password(conn, user.email)
+
+      assert response(conn, 200)
+
+      assert_enqueued(
+        worker: Users.Events,
+        args: %{"email" => user.email},
+        tags: ["forgot-password"]
+      )
+    end
+
+    test "when user is not registered", %{conn: conn} do
+      conn = forgot_password(conn, "does-not-exist@test.com")
+
+      assert response(conn, 200)
+
+      refute_enqueued(
+        worker: Users.Events,
+        tags: ["forgot-password"]
+      )
+    end
+  end
+
   describe "forward" do
     test "request forwarded", %{conn: conn} do
       http = Application.get_env(:users, :http)
@@ -102,6 +131,10 @@ defmodule UsersWeb.UserControllerTest do
       conn = get(conn, ~p"/health", @invalid_attrs)
       assert "healthy" = response(conn, 200)
     end
+  end
+
+  defp forgot_password(conn, email) do
+    post(conn, ~p"/users/forgot-password", %{email: email})
   end
 
   defp create_user_conn(%{conn: conn, user_data: user_params}) do
