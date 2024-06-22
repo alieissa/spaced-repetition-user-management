@@ -75,6 +75,16 @@ defmodule UsersWeb.UserController do
     send_resp(conn, :ok, "Logout")
   end
 
+  def forgot_password(conn, _, body_params) do
+    with {:ok, user} <- Accounts.get_user_by_email(body_params["email"]),
+         {:ok, token, _} <- Auth.get_token(user) do
+      Events.forgot_password(%{email: user.email, token: token})
+      send_resp(conn, 200, "")
+    else
+      _ -> send_resp(conn, 200, "")
+    end
+  end
+
   def forward(conn, _, _) do
     http = Application.get_env(:users, :http)
 

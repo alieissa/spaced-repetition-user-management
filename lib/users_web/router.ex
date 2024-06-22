@@ -32,6 +32,11 @@ defmodule UsersWeb.Router do
     post "/register", UserController, :create
   end
 
+  scope "/users", UsersWeb do
+    pipe_through :api
+    post "/forgot-password", UserController, :forgot_password
+  end
+
   scope "/", UsersWeb do
     pipe_through :auth
     forward "/", UserController, :forward

@@ -15,4 +15,18 @@ defmodule Users.Email do
     |> html_body(html_body)
     |> text_body("Please verify your email\n")
   end
+
+  def forgot_password(email: email, token: token) do
+    reset_password_url = System.get_env("RESET_PASSWORD_URL")
+    reset_password_link = "#{reset_password_url}?token=#{token}"
+
+    html_body = "Please click <a href=#{reset_password_link}>here</a> reset your password"
+
+    new()
+    |> to(email)
+    |> from("info@spaced-reps.com")
+    |> subject("spaced-reps.com password reset")
+    |> html_body(html_body)
+    |> text_body("Please reset your password\n")
+  end
 end

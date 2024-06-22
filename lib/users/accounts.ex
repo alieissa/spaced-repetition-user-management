@@ -45,15 +45,18 @@ defmodule Users.Accounts do
   ## Examples
 
      iex> get_user_by_email("foo@bar.com")
-     %User{}
+     {:ok, %User{}}
 
      iex> get_user_by_email("foo@baz.com")
-     nil
+     {:error, "User not found."}
   """
   def get_user_by_email(email) do
-    User
-    |> where(email: ^email)
-    |> Repo.one()
+    query = from u in User, where: u.email == ^email
+
+    case Repo.one(query) do
+      %User{} = user -> {:ok, user}
+      nil -> {:error, "User not found."}
+    end
   end
 
   def get_verified_user(email) do
