@@ -1,4 +1,4 @@
-defmodule UsersWeb.Auth.GuardianErrorHandler do
+defmodule UsersWeb.Auth.ErrorHandler do
   import Plug.Conn
   require Logger
 
