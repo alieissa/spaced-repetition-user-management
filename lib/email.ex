@@ -17,7 +17,7 @@ defmodule Users.Email do
   end
 
   def forgot_password(email: email, token: token) do
-    reset_password_url = System.get_env("RESET_PASSWORD_URL")
+    reset_password_url = Application.get_env(:users, :reset_password_url)
     reset_password_link = "#{reset_password_url}?token=#{token}"
 
     html_body = "Please click <a href=#{reset_password_link}>here</a> reset your password"
