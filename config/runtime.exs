@@ -37,7 +37,7 @@ if config_env() == :prod || config_env() == :dev do
       System.get_env("DB_PASSWORD") || raise("Environment variable DB_PASSWORD is not set."),
     pool_size: 10
 
-  config :users, UsersWeb.Auth.Guardian,
+  config :users, UsersWeb.Auth,
     issues: "users_app",
     secret_key: secret_key_base
 
