@@ -1,11 +1,8 @@
 on:
-  # pull_request:
-  #   types: [opened, synchronize, closed]
-  #   branches:
-  #     - main
-  push:
+  pull_request:
+    types: [opened, synchronize, closed]
     branches:
-      - 40-add-endpoint-for-forgotten-password
+      - main
 
 env:
   REPO: 079829475258.dkr.ecr.us-east-1.amazonaws.com
@@ -75,7 +72,7 @@ jobs:
     
   release:
     needs: tests
-    # if: github.event.pull_request.merged == true
+    if: github.event.pull_request.merged == true
     runs-on: ubuntu-20.04
     name: Release
     strategy:
