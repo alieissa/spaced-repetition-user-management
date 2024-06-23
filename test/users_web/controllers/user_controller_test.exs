@@ -42,7 +42,7 @@ defmodule UsersWeb.UserControllerTest do
   describe "update user" do
     setup [:create_verified_user_conn]
 
-    test "update user when data is valid", %{conn: conn, user: %User{id: id} = user} do
+    test "update user when data is valid", %{conn: conn, user: %User{id: id}} do
       conn = put(conn, ~p"/users/#{id}", %{"first_name" => "John", "last_name" => "Charlie"})
 
       assert %{
@@ -100,7 +100,7 @@ defmodule UsersWeb.UserControllerTest do
       assert response(conn, 200)
 
       assert_enqueued(
-        worker: Users.Events,
+        worker: Users.Worker,
         args: %{"email" => user.email},
         tags: ["forgot-password"]
       )
@@ -112,7 +112,7 @@ defmodule UsersWeb.UserControllerTest do
       assert response(conn, 200)
 
       refute_enqueued(
-        worker: Users.Events,
+        worker: Users.Worker,
         tags: ["forgot-password"]
       )
     end

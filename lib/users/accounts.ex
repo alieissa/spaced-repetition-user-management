@@ -40,7 +40,7 @@ defmodule Users.Accounts do
   @doc """
   Gets a single user by email
 
-  Returns 'nil' if the User does not exist.
+  Returns error if the user does not exist.
 
   ## Examples
 

@@ -8,7 +8,7 @@ config :users, UsersWeb.Endpoint,
   server: false
 
 config :users, Users.Repo,
-  database: System.get_env("DB_NAME", "spaced_repetition"),
+  database: System.get_env("DB_NAME", "spaced_repetition_test"),
   username: System.get_env("DB_USERNAME", "postgres"),
   password: System.get_env("DB_PASSWORD", "postgres"),
   hostname: System.get_env("POSTGRES_HOSTNAME", "db"),
