@@ -20,8 +20,6 @@ config :logger, :console,
 
 config :users, :http, HTTPoison
 
-config :users, :reset_password_url, System.get_env("RESET_PASSWORD_URL")
-
 config :phoenix, :json_library, Jason
 
 # Import environment specific config. This must remain at the bottom

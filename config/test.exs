@@ -15,7 +15,7 @@ config :users, Users.Repo,
   pool: Ecto.Adapters.SQL.Sandbox,
   pool_size: 10
 
-redis_host = System.get_env("CACHE_HOST", "cache")
+redis_host = System.get_env("CACHE_HOST", "localhost")
 
 config :users, Redix,
   host: redis_host,

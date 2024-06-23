@@ -21,6 +21,11 @@ if System.get_env("PHX_SERVER") do
 end
 
 if config_env() == :prod || config_env() == :dev do
+  config :users,
+         :reset_password_url,
+         System.get_env("RESET_PASSWORD_URL") ||
+           raise("The environment variable RESET_PASSWORD_URL is not set.")
+
   secret_key_base = System.get_env("SECRET_KEY_BASE")
 
   config :users, UsersWeb.Endpoint,
