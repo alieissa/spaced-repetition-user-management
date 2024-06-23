@@ -1,4 +1,4 @@
-defmodule Users.Events do
+defmodule Users.Worker do
   use Oban.Worker, queue: :registration
 
   @impl Oban.Worker

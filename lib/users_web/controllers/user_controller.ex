@@ -1,10 +1,9 @@
 defmodule UsersWeb.UserController do
   use UsersWeb, :controller
   import Plug.Conn
-
   alias UsersWeb.Auth
   alias Users.Accounts
-  alias Users.Events
+  alias Users.Worker
 
   action_fallback UsersWeb.FallbackController
 
@@ -39,10 +38,13 @@ defmodule UsersWeb.UserController do
     end
   end
 
+  # TODO reverse order of user creation and token creation
+  # If user is created and token creation fails, then db is in a bad
+  # state. Reversal makes user creation an atomic operation
   def create(conn, _, user_params) do
     with {:ok, user} <- Accounts.create_user(user_params),
          {:ok, token, _} <- Auth.get_token(user) do
-      Events.new_user(%{email: user.email, token: token})
+      Worker.new_user(%{email: user.email, token: token})
 
       conn
       |> put_status(:created)
@@ -78,7 +80,7 @@ defmodule UsersWeb.UserController do
   def forgot_password(conn, _, body_params) do
     with {:ok, user} <- Accounts.get_user_by_email(body_params["email"]),
          {:ok, token, _} <- Auth.get_token(user) do
-      Events.forgot_password(%{email: user.email, token: token})
+      Worker.forgot_password(%{email: user.email, token: token})
       send_resp(conn, 200, "")
     else
       _ -> send_resp(conn, 200, "")
