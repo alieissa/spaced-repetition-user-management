@@ -21,6 +21,11 @@ if System.get_env("PHX_SERVER") do
 end
 
 if config_env() == :prod || config_env() == :dev do
+  config :users,
+         :reset_password_url,
+         System.get_env("RESET_PASSWORD_URL") ||
+           raise("The environment variable RESET_PASSWORD_URL is not set.")
+
   secret_key_base = System.get_env("SECRET_KEY_BASE")
 
   config :users, UsersWeb.Endpoint,
@@ -37,7 +42,7 @@ if config_env() == :prod || config_env() == :dev do
       System.get_env("DB_PASSWORD") || raise("Environment variable DB_PASSWORD is not set."),
     pool_size: 10
 
-  config :users, UsersWeb.Auth.Guardian,
+  config :users, UsersWeb.Auth,
     issues: "users_app",
     secret_key: secret_key_base
 

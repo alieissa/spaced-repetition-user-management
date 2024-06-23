@@ -19,8 +19,9 @@ defmodule Users.AccountsTest do
     end
 
     test "get_user_by_email/1 returns user with given email" do
-      user = insert(:user)
-      assert Accounts.get_user_by_email(user.email) == user
+      user = insert(:user, %{})
+      {:ok, found_user} = Accounts.get_user_by_email(user.email)
+      assert found_user == user
     end
 
     test "create_user/1 with valid data creates a user" do

@@ -8,6 +8,7 @@ env:
   REPO: 079829475258.dkr.ecr.us-east-1.amazonaws.com
   IMAGE_NAME: spaced-repetition-user-management
 
+
 jobs:
   static_analysis:
     name: Static Analysis
@@ -94,7 +95,12 @@ jobs:
         run: chmod +x ./.github/workflows/update-dockerfile.sh & ./.github/workflows/update-dockerfile.sh
       
       - name: Build image
-        run: docker build -t $REPO/$IMAGE_NAME $GITHUB_WORKSPACE
+        run: |
+          echo "Display RESET_PASSWORD_URL before build"
+          echo $RESET_PASSWORD_URL
+          docker build -t $REPO/$IMAGE_NAME $GITHUB_WORKSPACE
+        env:
+          RESET_PASSWORD_URL: ${{ vars.RESET_PASSWORD_URL }}
 
       - name: Login to ECR
         id: ecr

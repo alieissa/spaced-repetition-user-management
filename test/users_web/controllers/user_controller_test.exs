@@ -1,10 +1,11 @@
 defmodule UsersWeb.UserControllerTest do
   use UsersWeb.ConnCase
+  use Oban.Testing, repo: Users.Repo
 
   import Mox
   import Users.Factory
   alias Users.Accounts.User
-  alias UsersWeb.Auth.Guardian
+  alias UsersWeb.Auth
 
   @invalid_attrs %{email: "invalidemail", first_name: nil, last_name: nil}
 
@@ -41,8 +42,8 @@ defmodule UsersWeb.UserControllerTest do
   describe "update user" do
     setup [:create_verified_user_conn]
 
-    test "update user when data is valid", %{conn: conn, user: %User{id: id} = user} do
-      conn = put(conn, ~p"/users/#{user}", %{"first_name" => "John", "last_name" => "Charlie"})
+    test "update user when data is valid", %{conn: conn, user: %User{id: id}} do
+      conn = put(conn, ~p"/users/#{id}", %{"first_name" => "John", "last_name" => "Charlie"})
 
       assert %{
                "id" => ^id,
@@ -89,6 +90,34 @@ defmodule UsersWeb.UserControllerTest do
     end
   end
 
+  describe "POST /users/forgot-password" do
+    @tag :wip
+    test "when user is registered", %{conn: conn} do
+      %{conn: conn, user: user} = create_verified_user_conn(%{conn: conn})
+
+      conn = forgot_password(conn, user.email)
+
+      assert response(conn, 200)
+
+      assert_enqueued(
+        worker: Users.Worker,
+        args: %{"email" => user.email},
+        tags: ["forgot-password"]
+      )
+    end
+
+    test "when user is not registered", %{conn: conn} do
+      conn = forgot_password(conn, "does-not-exist@test.com")
+
+      assert response(conn, 200)
+
+      refute_enqueued(
+        worker: Users.Worker,
+        tags: ["forgot-password"]
+      )
+    end
+  end
+
   describe "forward" do
     test "request forwarded", %{conn: conn} do
       http = Application.get_env(:users, :http)
@@ -104,6 +133,10 @@ defmodule UsersWeb.UserControllerTest do
     end
   end
 
+  defp forgot_password(conn, email) do
+    post(conn, ~p"/users/forgot-password", %{email: email})
+  end
+
   defp create_user_conn(%{conn: conn, user_data: user_params}) do
     user =
       insert(:user,
@@ -112,7 +145,7 @@ defmodule UsersWeb.UserControllerTest do
         password: user_params.password
       )
 
-    {:ok, token, user} = Guardian.get_token(user.email)
+    {:ok, token, _} = Auth.get_token(user)
 
     conn =
       conn

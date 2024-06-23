@@ -1,4 +1,4 @@
-defmodule Users.Tokens do
+defmodule UsersWeb.Auth.Tokens do
   def exists!(token) do
     Redix.command!(:tokens, ["EXISTS", token])
   end

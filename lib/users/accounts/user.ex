@@ -5,11 +5,11 @@ defmodule Users.Accounts.User do
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
   schema "users" do
-    field(:password, :string)
-    field(:email, :string)
-    field(:first_name, :string)
-    field(:last_name, :string)
-    field(:verified, :boolean)
+    field :password, :string
+    field :email, :string
+    field :first_name, :string
+    field :last_name, :string
+    field :verified, :boolean, default: false
 
     timestamps()
   end

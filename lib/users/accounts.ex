@@ -40,20 +40,33 @@ defmodule Users.Accounts do
   @doc """
   Gets a single user by email
 
-  Returns 'nil' if the User does not exist.
+  Returns error if the user does not exist.
 
   ## Examples
 
      iex> get_user_by_email("foo@bar.com")
-     %User{}
+     {:ok, %User{}}
 
      iex> get_user_by_email("foo@baz.com")
-     nil
+     {:error, "User not found."}
   """
   def get_user_by_email(email) do
-    User
-    |> where(email: ^email)
-    |> Repo.one()
+    query = from u in User, where: u.email == ^email
+
+    case Repo.one(query) do
+      %User{} = user -> {:ok, user}
+      nil -> {:error, "User not found."}
+    end
+  end
+
+  def get_verified_user(email) do
+    query = from u in User, where: u.email == ^email and u.verified == true
+
+    case Repo.one(query) do
+      %User{verified: true} = user -> {:ok, user}
+      %User{verified: false} -> {:error, "User not verified."}
+      nil -> {:error, "User not found."}
+    end
   end
 
   @doc """

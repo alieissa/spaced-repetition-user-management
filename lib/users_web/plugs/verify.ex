@@ -2,7 +2,7 @@ defmodule UsersWeb.Plugs.Verify do
   import Plug.Conn
 
   alias UsersWeb.Auth.ErrorResponse
-  alias Users.Tokens
+  alias UsersWeb.Auth.Tokens
 
   def init(default), do: default
 
