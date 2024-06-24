@@ -87,6 +87,14 @@ defmodule UsersWeb.UserController do
     end
   end
 
+  def reset_password(conn, _, body_params) do
+    user = Guardian.Plug.current_resource(conn)
+
+    with {:ok, _} <- Accounts.update_user(user, body_params) do
+      send_resp(conn, 200, "")
+    end
+  end
+
   def forward(conn, _, _) do
     http = Application.get_env(:users, :http)
 

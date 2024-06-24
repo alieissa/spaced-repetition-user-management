@@ -91,7 +91,6 @@ defmodule UsersWeb.UserControllerTest do
   end
 
   describe "POST /users/forgot-password" do
-    @tag :wip
     test "when user is registered", %{conn: conn} do
       %{conn: conn, user: user} = create_verified_user_conn(%{conn: conn})
 
@@ -118,6 +117,22 @@ defmodule UsersWeb.UserControllerTest do
     end
   end
 
+  describe "POST /users/reset-password" do
+    test "when user is registered", %{conn: conn} do
+      %{conn: conn} = create_verified_user_conn(%{conn: conn})
+      new_password = "newpassword"
+      conn = reset_password(conn, new_password)
+
+      assert response(conn, 200)
+    end
+
+    test "when user is not registered", %{conn: conn} do
+      conn = reset_password(conn, "newpassword")
+
+      assert response(conn, 401)
+    end
+  end
+
   describe "forward" do
     test "request forwarded", %{conn: conn} do
       http = Application.get_env(:users, :http)
@@ -135,6 +150,10 @@ defmodule UsersWeb.UserControllerTest do
 
   defp forgot_password(conn, email) do
     post(conn, ~p"/users/forgot-password", %{email: email})
+  end
+
+  defp reset_password(conn, password) do
+    post(conn, ~p"/users/reset-password", %{password: password})
   end
 
   defp create_user_conn(%{conn: conn, user_data: user_params}) do
