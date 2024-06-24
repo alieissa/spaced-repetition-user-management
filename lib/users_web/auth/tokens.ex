@@ -7,6 +7,10 @@ defmodule UsersWeb.Auth.Tokens do
     Redix.command!(:tokens, ["DEL", token])
   end
 
+  def set(token) do
+    Redix.command(:tokens, ["SETEX", token, 7 * 24 * 60 * 60, 0])
+  end
+
   def blacklist!(token) do
     # TODO Set expiry time in config
     Redix.command!(:tokens, ["SETEX", token, 7 * 24 * 60 * 60, 0])

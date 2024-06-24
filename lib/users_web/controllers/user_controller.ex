@@ -79,7 +79,8 @@ defmodule UsersWeb.UserController do
 
   def forgot_password(conn, _, body_params) do
     with {:ok, user} <- Accounts.get_user_by_email(body_params["email"]),
-         {:ok, token, _} <- Auth.get_token(user) do
+         {:ok, token, _} <- Auth.get_token(user),
+         {:ok, _} <- Auth.save_forgotten_token(token) do
       Worker.forgot_password(%{email: user.email, token: token})
       send_resp(conn, 200, "")
     else

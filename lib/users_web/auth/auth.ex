@@ -39,4 +39,13 @@ defmodule UsersWeb.Auth do
   def blacklist_token(token) do
     UsersWeb.Auth.Tokens.blacklist!(token)
   end
+
+  def save_forgotten_token(token) do
+    UsersWeb.Auth.Tokens.set(token)
+  end
+
+  def is_forgotten_password?(token) do
+    cached_tokens = UsersWeb.Auth.Tokens.exists!(token)
+    cached_tokens != 0
+  end
 end
