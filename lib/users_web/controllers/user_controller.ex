@@ -1,3 +1,6 @@
+# TODO Use Account.get_user instead of Guardian.Plug.current_resource. Move resource
+# access to accounts context, and finally change account context so that only id
+# is accepted where entire user entity passed
 defmodule UsersWeb.UserController do
   use UsersWeb, :controller
   import Plug.Conn
@@ -22,6 +25,23 @@ defmodule UsersWeb.UserController do
     render(conn, :show, user: user)
   end
 
+  # TODO reverse order of user creation and token creation
+  # If user is created and token creation fails, then db is in a bad
+  # state. Reversal makes user creation an atomic operation
+  def create(conn, _, user_params) do
+    with {:ok, user} <- Accounts.create_user(user_params),
+         {:ok, token, _} <- Auth.get_token(user) do
+      Worker.new_user(%{email: user.email, token: token})
+
+      conn
+      |> put_status(:created)
+      |> render(:show, user: user)
+    else
+      # TODO (44) move this to errors controller
+      _ -> send_resp(conn, 422, "Invalid user data provide.")
+    end
+  end
+
   def update(conn, _, user_params) do
     user = Guardian.Plug.current_resource(conn)
 
@@ -38,26 +58,12 @@ defmodule UsersWeb.UserController do
     end
   end
 
-  # TODO reverse order of user creation and token creation
-  # If user is created and token creation fails, then db is in a bad
-  # state. Reversal makes user creation an atomic operation
-  def create(conn, _, user_params) do
-    with {:ok, user} <- Accounts.create_user(user_params),
-         {:ok, token, _} <- Auth.get_token(user) do
-      Worker.new_user(%{email: user.email, token: token})
-
-      conn
-      |> put_status(:created)
-      |> render(:show, user: user)
-    end
-  end
-
   def verify(conn, _, _) do
-    conn
-    |> Guardian.Plug.current_resource()
-    |> Accounts.verify_user()
+    user = Guardian.Plug.current_resource(conn)
 
-    send_resp(conn, :ok, "Your email has been verified.You can now login.")
+    with {:ok, _} <- Accounts.verify_user(user) do
+      send_resp(conn, :ok, "Your email has been verified.You can now login.")
+    end
   end
 
   def login(conn, _, %{"email" => email, "password" => raw_password}) do
@@ -66,6 +72,9 @@ defmodule UsersWeb.UserController do
       conn
       |> put_status(:ok)
       |> render(:token, token: token)
+    else
+      # TODO (44) move this to errors controller
+      _ -> send_resp(conn, 401, "Wrong email and/or password.")
     end
   end
 
@@ -79,11 +88,20 @@ defmodule UsersWeb.UserController do
 
   def forgot_password(conn, _, body_params) do
     with {:ok, user} <- Accounts.get_user_by_email(body_params["email"]),
-         {:ok, token, _} <- Auth.get_token(user) do
+         {:ok, token, _} <- Auth.get_token(user),
+         {:ok, _} <- Auth.save_forgotten_token(token) do
       Worker.forgot_password(%{email: user.email, token: token})
       send_resp(conn, 200, "")
     else
       _ -> send_resp(conn, 200, "")
+    end
+  end
+
+  def reset_password(conn, _, body_params) do
+    user = Guardian.Plug.current_resource(conn)
+
+    with {:ok, _} <- Accounts.update_user(user, body_params) do
+      send_resp(conn, 200, "Password reset")
     end
   end
 

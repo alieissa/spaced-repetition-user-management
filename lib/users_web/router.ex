@@ -24,6 +24,7 @@ defmodule UsersWeb.Router do
     put "/:id", UserController, :update
     get "/logout", UserController, :logout
     get "/deregister", UserController, :delete
+    post "/reset-password", UserController, :reset_password
   end
 
   scope "/users", UsersWeb do
