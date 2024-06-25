@@ -12,6 +12,7 @@ defmodule UsersWeb.Plugs.Verify do
       |> get_req_header("authorization")
       |> Tokens.exists!()
 
+    # TODO(44) Instead of raising call proper error controller method
     if cached_tokens == 0, do: conn, else: raise(ErrorResponse.Unauthorized)
   end
 end
