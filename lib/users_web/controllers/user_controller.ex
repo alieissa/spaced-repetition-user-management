@@ -66,6 +66,11 @@ defmodule UsersWeb.UserController do
       conn
       |> put_status(:ok)
       |> render(:token, token: token)
+    else
+      _ ->
+        conn
+        |> put_resp_content_type("application/text")
+        |> send_resp(401, "Wrong email and/or password.")
     end
   end
 
@@ -92,7 +97,7 @@ defmodule UsersWeb.UserController do
     user = Guardian.Plug.current_resource(conn)
 
     with {:ok, _} <- Accounts.update_user(user, body_params) do
-      send_resp(conn, 200, "")
+      conn |> put_resp_content_type("application/text") |> send_resp(200, "Password reset")
     end
   end
 

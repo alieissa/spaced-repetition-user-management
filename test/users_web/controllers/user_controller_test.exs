@@ -77,8 +77,7 @@ defmodule UsersWeb.UserControllerTest do
 
     test "login", %{conn: conn, user: _user} do
       # Email and password are creds of verified user
-      conn =
-        post(conn, ~p"/users/login", %{"email" => "jbravo@test.com", "password" => "jbravo1a"})
+      conn = login(conn, %{"email" => "jbravo@test.com", "password" => "jbravo1a"})
 
       assert response(conn, 200)
     end
@@ -118,15 +117,30 @@ defmodule UsersWeb.UserControllerTest do
   end
 
   describe "POST /users/reset-password" do
-    test "when user is registered", %{conn: conn} do
-      %{conn: conn} = create_verified_user_conn(%{conn: conn})
+    @tag :wip
+    test "when user is verified", %{conn: conn} do
+      user_data = %{
+        email: "johnnybravo@cartoonnetwork.com",
+        password: "johnny1",
+        verified: true
+      }
+
+      user = setup_user(user_data)
+      conn = setup_conn(conn, user)
+
       new_password = "newpassword"
       conn = reset_password(conn, new_password)
+      assert text_response(conn, 200)
 
-      assert response(conn, 200)
+      conn = login(conn, %{email: user_data.email, password: user_data.password})
+      assert text_response(conn, 401)
+
+      conn = login(conn, %{email: user.email, password: new_password})
+      assert %{"token" => _token} = json_response(conn, 200)
     end
 
-    test "when user is not registered", %{conn: conn} do
+    test "when user is not verified", %{conn: conn} do
+      %{conn: conn} = create_unverified_user_conn(%{conn: conn})
       conn = reset_password(conn, "newpassword")
 
       assert response(conn, 401)
@@ -154,6 +168,31 @@ defmodule UsersWeb.UserControllerTest do
 
   defp reset_password(conn, password) do
     post(conn, ~p"/users/reset-password", %{password: password})
+  end
+
+  defp login(conn, creds) do
+    post(conn, ~p"/users/login", creds)
+  end
+
+  def setup_user(user_params \\ %{}) do
+    user_data =
+      Map.merge(
+        %{email: "jbravo@test.com", password: "jbravo1a", verified: false},
+        user_params
+      )
+
+    IO.inspect(user_data)
+
+    insert(:user, user_data)
+  end
+
+  def setup_conn(conn, user) do
+    {:ok, token, _} = Auth.get_token(user)
+
+    conn
+    |> recycle()
+    |> put_req_header("authorization", "Bearer #{token}")
+    |> put_req_header("accept", "application/json")
   end
 
   defp create_user_conn(%{conn: conn, user_data: user_params}) do
