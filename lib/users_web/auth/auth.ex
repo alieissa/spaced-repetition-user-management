@@ -44,7 +44,7 @@ defmodule UsersWeb.Auth do
     UsersWeb.Auth.Tokens.set(token)
   end
 
-  def is_forgotten_password?(token) do
+  def forgotten_password?(token) do
     cached_tokens = UsersWeb.Auth.Tokens.exists!(token)
     cached_tokens != 0
   end

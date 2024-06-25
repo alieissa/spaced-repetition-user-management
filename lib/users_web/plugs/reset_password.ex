@@ -10,7 +10,7 @@ defmodule UsersWeb.Plugs.ResetPassword do
     is_forgotten_password =
       conn
       |> get_req_header("authorization")
-      |> Auth.is_forgotten_password?()
+      |> Auth.forgotten_password?()
 
     if is_forgotten_password, do: conn, else: raise(ErrorResponse.Unauthorized)
   end
