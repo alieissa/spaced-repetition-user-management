@@ -23,7 +23,7 @@ defmodule UsersWeb.MixProject do
   def application do
     [
       mod: {UsersWeb.Application, []},
-      extra_applications: [:logger, :runtime_tools, :users_core]
+      extra_applications: [:logger, :runtime_tools]
     ]
   end
 
@@ -36,6 +36,7 @@ defmodule UsersWeb.MixProject do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
+      {:users_core, in_umbrella: true},
       {:phoenix, "~> 1.7.7"},
       {:phoenix_ecto, "~> 4.4"},
       {:telemetry_metrics, "~> 0.6"},

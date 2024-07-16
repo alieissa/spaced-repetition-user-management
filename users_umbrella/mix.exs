@@ -24,7 +24,11 @@ defmodule Users.Umbrella.MixProject do
   # Dependencies listed here are available only for this project
   # and cannot be accessed from applications inside the apps/ folder.
   defp deps do
-    []
+    [
+      {:ex_machina, "~> 2.7"},
+      {:mox, "~> 1.1.0", only: :test},
+      {:credo, "~> 1.7", only: [:dev, :test], runtime: false}
+    ]
   end
 
   # Aliases are shortcuts or tasks specific to the current project.
