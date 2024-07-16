@@ -25,8 +25,6 @@ defmodule Users.Umbrella.MixProject do
   # and cannot be accessed from applications inside the apps/ folder.
   defp deps do
     [
-      {:ex_machina, "~> 2.7"},
-      {:mox, "~> 1.1.0", only: :test},
       {:credo, "~> 1.7", only: [:dev, :test], runtime: false}
     ]
   end

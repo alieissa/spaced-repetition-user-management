@@ -43,7 +43,8 @@ defmodule UsersCore.MixProject do
       {:swoosh, "~> 1.0"},
       {:hackney, "~> 1.9"},
       {:gen_smtp, "~> 1.0"},
-      {:oban, "~> 2.16"}
+      {:oban, "~> 2.16"},
+      {:ex_machina, "~> 2.7", only: :test},
     ]
   end
 
