@@ -1,0 +1,5 @@
+Application.ensure_all_started(:logger, :users_core)
+ExUnit.start(exclude: [:skip])
+# Ecto.Adapters.SQL.Sandbox.mode(UsersCore.Repo, :manual)
+Mox.defmock(UsersWeb.HTTPClientMock, for: HTTPoison.Base)
+Application.put_env(:users_web, :http, UsersWeb.HTTPClientMock)

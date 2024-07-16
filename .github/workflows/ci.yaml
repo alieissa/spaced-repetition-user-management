@@ -8,6 +8,9 @@ env:
   REPO: 079829475258.dkr.ecr.us-east-1.amazonaws.com
   IMAGE_NAME: spaced-repetition-user-management
 
+defaults:
+  run:
+    working-directory: users_umbrella
 
 jobs:
   static_analysis:
