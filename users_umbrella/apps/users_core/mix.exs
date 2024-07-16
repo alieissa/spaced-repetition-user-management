@@ -38,16 +38,14 @@ defmodule UsersCore.MixProject do
     [
       {:ecto_sql, "~> 3.10"},
       {:postgrex, ">= 0.0.0"},
-      {:ecto_sql, "~> 3.10"},
-      {:postgrex, ">= 0.0.0"},
-      {:guardian, "~> 2.3"},
       {:bcrypt_elixir, "~> 3.0"},
       {:redix, "~> 1.2"},
       {:ex_machina, "~> 2.7"},
-      {:mox, "~> 1.1.0", only: :test},
       {:swoosh, "~> 1.0"},
+      {:hackney, "~> 1.9"},
       {:gen_smtp, "~> 1.0"},
       {:oban, "~> 2.16"},
+      {:mox, "~> 1.1.0", only: :test},
       {:credo, "~> 1.7", only: [:dev, :test], runtime: false}
     ]
   end
