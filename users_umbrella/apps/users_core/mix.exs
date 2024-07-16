@@ -1,10 +1,14 @@
-defmodule Users.MixProject do
+defmodule UsersCore.MixProject do
   use Mix.Project
 
   def project do
     [
-      app: :users,
+      app: :users_core,
       version: "0.1.0",
+      build_path: "../../_build",
+      config_path: "../../config/config.exs",
+      deps_path: "../../deps",
+      lockfile: "../../mix.lock",
       elixir: "~> 1.14",
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
@@ -18,7 +22,7 @@ defmodule Users.MixProject do
   # Type `mix help compile.app` for more information.
   def application do
     [
-      mod: {Users.Application, []},
+      mod: {UsersCore.Application, []},
       extra_applications: [:logger, :runtime_tools]
     ]
   end
@@ -32,26 +36,23 @@ defmodule Users.MixProject do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
-      {:phoenix, "~> 1.7.7"},
+      {:ecto_sql, "~> 3.10"},
       {:postgrex, ">= 0.0.0"},
-      {:telemetry_metrics, "~> 0.6"},
-      {:telemetry_poller, "~> 1.0"},
-      {:jason, "~> 1.2"},
-      {:plug_cowboy, "~> 2.5"},
+      {:ecto_sql, "~> 3.10"},
+      {:postgrex, ">= 0.0.0"},
       {:guardian, "~> 2.3"},
-      {:httpoison, "~> 2.1"},
+      {:bcrypt_elixir, "~> 3.0"},
+      {:redix, "~> 1.2"},
       {:ex_machina, "~> 2.7"},
       {:mox, "~> 1.1.0", only: :test},
       {:swoosh, "~> 1.0"},
-      {:cors_plug, "~> 3.0"},
+      {:gen_smtp, "~> 1.0"},
+      {:oban, "~> 2.16"},
       {:credo, "~> 1.7", only: [:dev, :test], runtime: false}
     ]
   end
 
   # Aliases are shortcuts or tasks specific to the current project.
-  # For example, to install project dependencies and perform other setup tasks, run:
-  #
-  #     $ mix setup
   #
   # See the documentation for `Mix` for more info on aliases.
   defp aliases do
