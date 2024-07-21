@@ -30,12 +30,12 @@ if config_env() == :prod || config_env() == :dev do
 
   config :users_web, UsersWeb.Endpoint,
     http: [ip: {0, 0, 0, 0}, port: String.to_integer(System.get_env("PORT", "4000"))],
+    server: true,
     secret_key_base: secret_key_base
 
-
-    config :users_web, UsersWeb.Auth,
-      issues: "users_app",
-      secret_key: secret_key_base
+  config :users_web, UsersWeb.Auth,
+    issues: "users_app",
+    secret_key: secret_key_base
 
   config :users_core, UsersCore.Repo,
     hostname:

@@ -13,10 +13,6 @@ import Config
 config :users_core,
   ecto_repos: [UsersCore.Repo]
 
-config :users_web,
-  ecto_repos: [UsersCore.Repo],
-  generators: [context_app: :users, binary_id: true]
-
 # Configures the endpoint
 config :users_web, UsersWeb.Endpoint,
   url: [host: "localhost"],
