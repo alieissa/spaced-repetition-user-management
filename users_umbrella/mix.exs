@@ -14,6 +14,12 @@ defmodule Users.Umbrella.MixProject do
             users_web: :permanent,
             users_core: :permanent
           ]
+        ],
+        users_lambda: [
+          applications: [
+            users_lambda: :permanent,
+            users_core: :permanent
+          ]
         ]
       ]
     ]
