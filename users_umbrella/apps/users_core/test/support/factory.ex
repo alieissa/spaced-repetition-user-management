@@ -12,7 +12,7 @@ defmodule UsersCore.Factory do
       password: Bcrypt.hash_pwd_salt(password),
       verified: verified,
       first_name: "Johnny",
-      last_name: "Bravo",
+      last_name: "Bravo"
     }
   end
 end
