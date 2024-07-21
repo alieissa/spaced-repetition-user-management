@@ -46,6 +46,7 @@ RUN mix deps.compile
 
 COPY apps/users_core/priv ./apps/users_core/priv
 COPY apps/users_core/lib ./apps/users_core/lib
+COPY apps/users_lambda/priv ./apps/users_lambda/priv
 COPY apps/users_lambda/lib ./apps/users_lambda/lib
 
 # Compile the release
@@ -54,7 +55,7 @@ RUN mix compile
 # Changes to config/runtime.exs don't require recompiling the code
 COPY config/runtime.exs ./config/
 
-RUN mix release users_server
+RUN mix release users_lambda
 
 # start a new build stage so that the final image will only contain
 # the compiled release and other runtime necessities
@@ -86,5 +87,8 @@ USER nobody
 # advised to add an init process such as tini via `apt-get install`
 # above and adding an entrypoint. See https://github.com/krallin/tini for details
 # ENTRYPOINT ["/tini", "--"]
-
-CMD ["bin/users_lambda", "start"]
+COPY --chmod=755 apps/users_lambda/priv/bootstrap ${LAMBDA_RUNTIME_DIR}/bootstrap
+# COPY --chmod=755 --chown=nobody:root apps/users_lambda/priv/handle ${LAMBDA_RUNTIME_DIR}/handle
+COPY --chown=nobody:root apps/users_lambda/priv/handle ./handle
+RUN chmod +x ./handle
+CMD ["./handle"]

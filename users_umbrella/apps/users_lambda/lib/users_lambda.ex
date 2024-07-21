@@ -2,17 +2,17 @@ defmodule UsersLambda do
   @moduledoc """
   Documentation for `UsersLambda`.
   """
-
+require Logger
   @doc """
   Hello world.
 
   ## Examples
 
-      iex> UsersLambda.hello()
+      iex> UsersLambda.handle()
       :world
 
   """
-  def hello do
-    :world
+  def handle do
+    Logger.info("Lambda handler")
   end
 end

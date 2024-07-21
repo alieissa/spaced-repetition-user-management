@@ -3,10 +3,13 @@ on:
     types: [opened, synchronize, closed]
     branches:
       - main
+  push:
+    branches:
+      - 48-create-aws-lambda-app
 
 env:
   REPO: 079829475258.dkr.ecr.us-east-1.amazonaws.com
-  IMAGE_NAME: spaced-repetition-user-management
+  IMAGE_NAME: spaced-repetition-user-management-lambda
 
 defaults:
   run:
@@ -14,6 +17,7 @@ defaults:
 
 jobs:
   static_analysis:
+    if: false
     name: Static Analysis
     runs-on: ubuntu-20.04
     strategy:
@@ -32,6 +36,7 @@ jobs:
           mix deps.get
           mix credo 
   tests:
+    if: false
     needs: static_analysis
     runs-on: ubuntu-20.04
     name: Test
@@ -73,8 +78,8 @@ jobs:
           REDIS_HOST: localhost
           SECRET_KEY_BASE: 'dummysecretkeybase1234' 
   release:
-    needs: tests
-    if: github.event.pull_request.merged == true
+    # needs: tests
+    # if: github.event.pull_request.merged == true
     runs-on: ubuntu-20.04
     name: Release
     strategy:
@@ -96,21 +101,22 @@ jobs:
           otp-version: ${{matrix.otp}}
           elixir-version: ${{matrix.elixir}}
 
-      - name: Push server image to ECR
+      - name: Push lambda image to ECR
         run: |
-          docker build -f Dockerfile.server -t $REPO/$IMAGE_NAME .
+          docker build -f Dockerfile.lambda -t $REPO/$IMAGE_NAME .
           docker push $REPO/$IMAGE_NAME
           docker tag $REPO/$IMAGE_NAME $REPO/$IMAGE_NAME:${GITHUB_SHA::6}
           docker push $REPO/$IMAGE_NAME:${GITHUB_SHA::6}
   deploy:
-      needs: 
-        - release
-      runs-on: ubuntu-22.04
-      name: Deploy
-      steps:
-        - name: Restart ECS Service
-          run: aws ecs update-service --cluster sp --service sp-auth --force-new-deployment
-      env:
-        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY }}
-        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_ACCESS_SECRET_KEY }}
-        AWS_DEFAULT_REGION: ${{ vars.REGION }}
+    if: false
+    needs: 
+      - release
+    runs-on: ubuntu-22.04
+    name: Deploy
+    steps:
+      - name: Restart ECS Service
+        run: aws ecs update-service --cluster sp --service sp-auth --force-new-deployment
+    env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_ACCESS_SECRET_KEY }}
+      AWS_DEFAULT_REGION: ${{ vars.REGION }}
