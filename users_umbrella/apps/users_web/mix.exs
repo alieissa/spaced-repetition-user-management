@@ -46,7 +46,7 @@ defmodule UsersWeb.MixProject do
       {:guardian, "~> 2.3"},
       {:httpoison, "~> 2.1"},
       {:cors_plug, "~> 3.0"},
-      {:mox, "~> 1.1.0", only: :test},
+      {:mox, "~> 1.1.0", only: :test}
     ]
   end
 

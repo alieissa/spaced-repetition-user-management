@@ -10,10 +10,12 @@ defmodule UsersCore.Application do
     children = [
       # Start the Ecto repository
       UsersCore.Repo,
+      # Run migrations
+      {Ecto.Migrator, repos: Application.fetch_env!(:users_core, :ecto_repos)},
       # Queue for mail
       {Oban, Application.fetch_env!(:users_core, Oban)},
       # Start Redix worker
-      {Redix, Application.fetch_env!(:users_core, Redix)},
+      {Redix, Application.fetch_env!(:users_core, Redix)}
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
