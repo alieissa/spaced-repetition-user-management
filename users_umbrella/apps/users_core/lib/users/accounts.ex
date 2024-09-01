@@ -2,6 +2,7 @@ defmodule UsersCore.Accounts do
   @moduledoc """
   The Accounts context.
   """
+require Logger
   import Ecto.Query, warn: false
   alias UsersCore.Repo
 
@@ -81,6 +82,7 @@ defmodule UsersCore.Accounts do
 
   """
   def create_user(attrs \\ %{}) do
+    Logger.info('create user')
     %User{}
     |> User.changeset(attrs)
     |> Repo.insert()
