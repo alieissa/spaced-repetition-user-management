@@ -36,7 +36,7 @@ services:
       context: .
       dockerfile: Dockerfile.dev
     volumes:
-      - ./users_umbrella:/app
+      - ./:/app
     ports:
       - 4000:4000
     env_file:

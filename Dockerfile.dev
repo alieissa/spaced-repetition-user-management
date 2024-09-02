@@ -1,6 +1,6 @@
 FROM elixir:1.14
 
-COPY ./users_umbrella /app
+COPY ./ /app
 WORKDIR /app
 
 RUN mix local.hex --force
